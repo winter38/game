@@ -121,83 +121,90 @@ $p2['dex'] = 8;
 // player_id -> index in $pls
 $hit_targets[] = 0;
 
+$action = 1;
+
+
 $ci = count($hit_targets);
 for( $i = 0; $i < $ci; $i++ ){
-    
+
+    switch( $action ){
+        case 1:  player_hit($p1, $hit_targets[$i], $log);
+    }
 }
 
 
+// // $p1 hits $p2 - only 1 hit!
+function player_hit(&$p1, &$p2, &$log = array()){
 
-// Hit example ---------------------------------------------------------------->
-// min accuracity  10% - 15%
-// Difference between players dex gives or removes accuracy (for 1player its accuracy, for 2player evasion)
-$dif = abs($p1['dex']-$p2['dex']) * $game['dex_bonus']; // 1 dex = 1% accuracy/evasion
+    // Hit example ---------------------------------------------------------------->
+    // min accuracity  10% - 15%
+    $dex_bonus = 0.02;
+    $dif = abs($p1['dex']-$p2['dex']) * $dex_bonus; // 1 dex = 1% accuracy/evasion
 
-$p1['acc'] += $dif; // change p1 acc
+    $p1['acc'] += $dif; // change p1 acc
 
-$hit_chance = $p1['acc'] - $p2['eva'];
-$hit   = mt_frand();
-$block = mt_frand();
-$d_dmg = mt_rand(1, $p1['dmg']);
-
-$dmg = $d_dmg + $p1['dmg+'];
-
-if( $hit_chance >= $hit ){
-    // Ok, player hitted his targer, now, opponent action
+    $hit_chance = $p1['acc'] - $p2['eva']; // float 0,02356 
     
-    if( $p2['block'] >= $block ){ // opponent have blocked that hit!
-        // hit to block - to stamina and hp?
-        // Block decreases damage
-        if( $p2['st'] < $dmg ){
-            $dmg = $p2['st'] - $dmg; // part of damage taken by stamina
+    $hit = mt_frand();
+    $block = mt_frand();
+
+    if( $hit_chance >= $hit ){
+        // Ok, player hitted his targer, now, opponent action
+        
+        if( $p2['block'] >= $block ){ // opponent have blocked that hit!
+            // hit to block - to stamina and hp?
+            // Block decreases damage
+            $log[] = 'blocked';
+        }
+        else{ // opponent haven`t blocked
+            
+            
+            $dmg = mt_rand(5+floor($p1['str']), 10+$p1['str']);
             $p2['hp'] -= $dmg;
+            $log[] = 'hit for ' . $dmg;
+            // it`s dirrect hit to hp
+            // calc damage
+        }
+    }
+    else $log[] = 'miss';
+    // ---------------------------------------------------------------------------->
+
+    return true;
+}
+
+
+function battle(&$p1, &$p2, &$log = array()){
+
+    $game['rounds'] = false;
+    // Battle --------------------------------------------------------------------->
+    if( $game['rounds'] ) $counter = $game['rounds'];
+    while( 1 ){ // yes, always!
+        
+
+        player_hit($p1, $p2, $log);
+        player_hit($p2, $p1, $log);
+        
+        // for( $i = 0; $i < $game['round_hits']; $i++ ){
+            
+        // }
+        
+        
+        // End condition --------------------------------------------------------->>
+        if( $game['rounds'] ){
+            $counter--;
+            if( $counter <= 0 ) break; // Round 0 - end of battle
         }
         else{
-            $p2['hp'] -= $dmg;
+            if( $p1['hp'] < 1 || $p2['hp'] < 1 ) break;
         }
+        // ----------------------------------------------------------------------->>
     }
-    else{ // opponent haven`t blocked
-       
-        // it`s dirrect hit to hp
-        $p2['hp'] -= $dmg;
-        if( $p1['st'] < $dmg ) $dmg = $p1['st']; // For damage we need stamina
-        $p1['st'] -= $dmg;
-    }
+    // ---------------------------------------------------------------------------->
+
+    d_echo('end of battle');
 }
-else{
-    // miss
-}
-// ---------------------------------------------------------------------------->
 
 
-
-// Battle --------------------------------------------------------------------->
-if( $game['rounds'] ) $counter = $game['rounds'];
-while( 1 ){ // yes, always!
-    
-    
-    for( $i = 0; $i < $game['round_hits']; $i++ ){
-
-        // players hits
-    }
-    
-    
-    // End condition --------------------------------------------------------->>
-    if( $game['rounds'] ){
-        $counter--;
-        if( $counter =< 0 ) break; // Round 0 - end of battle
-    }
-    else{
-        // Check if player has 0hp
-    }
-    // ----------------------------------------------------------------------->>
-}
-// ---------------------------------------------------------------------------->
-
-// $p1 hits $p2 - only 1 hit!
-function player_hit($p1, $p2){
-    
-}
 
 
 // qdm_one_hit()
