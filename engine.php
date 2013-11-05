@@ -40,6 +40,7 @@ function init_player($id = false){
     $s['ref']  = 1; // reflex - evade traps
     $s['will'] = 1; // spell resistance
     $s['fort'] = 1; // Fortitude - physical resistance
+    $s['init'] = 1; // Initiative
     
     $s['st'] = 100; // stamina  
     $s['hp'] = 100; // health points
@@ -86,6 +87,7 @@ function init_player($id = false){
     $s['fort'] += floor($s['con']/5);
     $s['ref']  += floor($s['dex']/5);
     $s['will'] += floor($s['int']/5);
+    $s['init'] += mt_rand(1, 20) + floor($s['dex']/3);
     
     $s['hp_max'] = $s['hp'];
     // ------------------------------------------------------------------------>
@@ -99,6 +101,7 @@ function init_player($id = false){
     return $s;
 }
 
+// Fot test ------------------------------------------------------------------->
 $pls = array();
 $pls[] = init_player();
 $pls[] = init_player();
@@ -108,32 +111,123 @@ $p1['dex'] = 5;
 $p2['dex'] = 8;
 // if p1 hits p2 =>
 
-
-// Group, Multihits ----------------------------------------------------------->
-// if group fight - select opponent
-// if multi hits  - select opponents and roll for all
-// if all enemies - roll for all opponents
-// if all         - enemies and allies
-
-// tricky - mass hit - is 1 hit for all
-// multi hit - multi hit (many hits for 1 or several opponents)
+$grps = array(); // battle groups
+$grp[] = $p1;
+$grp[] = $p2;
 // ---------------------------------------------------------------------------->
-// player_id -> index in $pls
-$hit_targets[] = 0;
-
-$action = 1;
 
 
-$ci = count($hit_targets);
-for( $i = 0; $i < $ci; $i++ ){
+// Full battle
+function battle(){
 
-    switch( $action ){
-        case 1:  player_hit($p1, $hit_targets[$i], $log);
+    // Sort by init, in reverse order ----------------------------------------->
+    // this part can used, when there are many players  
+    $init = player_initiative($pls);
+    // ------------------------------------------------------------------------>
+        
+
+    $while_counter = 0;
+    $rounds_counter = 0;
+    $ci = count($init);
+
+    // will fight till one team left
+    while( !qdm_battle_end($players, $grp) ){
+
+        $while_counter++;
+        
+        // Group bonus --------------------------------------------->
+        // Group bonus goes to tmp bufs - so, when bufer dies - bonus will end
+        // Applies every round
+        // TODO
+        // qdm_grp_bonus($grp, $players, $file);
+        // --------------------------------------------------------->
+
+        
+        // Group attack -------------------------------------------->
+        // TODO
+        // --------------------------------------------------------->
+
+        
+        // Decide which action
+        $ci = count($init);
+        for( $i = 0; $i < $ci; $i++ ){ 
+            
+            $rounds_counter++;
+            
+            
+            // One team left - end of battle
+            if( count($grp) < 2 ) break;
+
+            // Player hit order - index is player number in $pls array
+            $string = strstr($init[$i], '_');
+            $index  = substr($string, 1);
+
+            if( $pls[$index]['hp'] < 1 ) continue; // skip dead players
+            $p1 = &$pls[$index];
+
+            // Trigger some skill action before hit --------------------------->
+            // qdm_skill_second_breath($pls[$index], $grp, $pls, $file);
+            // qdm_skill_intimidate($p1, $grp, $pls, $file);
+            // ---------------------------------------------------------------->
+            
+            
+            // Group, Multihits ----------------------------------------------->
+            // if group fight - select opponent
+            // if multi hits  - select opponents and roll for all
+            // if all enemies - roll for all opponents
+            // if all         - enemies and allies
+            // tricky - mass hit - is 1 hit for all
+            // multi hit - multi hit (many hits for 1 or several opponents)
+            // ---------------------------------------------------------------->
+
+
+            // Skill as actions ----------------------------------------------->
+            // if( qdm_cleric_heal($p1, $pls, $grp)     && qdm_tmp_effects($p1) ) continue;
+            // if( qdm_cleric_grp_heal($p1, $pls, $grp) && qdm_tmp_effects($p1) ) continue;
+            // ---------------------------------------------------------------->
+            
+            
+            // Decide what we will do ----------------------------------------->
+            // TODO
+            // $action = player_actions($p1, $pls, $grp);
+            // Do it!
+            // $action($p1, $pls, $grp, $log);
+            // ---------------------------------------------------------------->
+            
+        }
+        
+        
+        // End of round ------------------------------------------------------->
+        // TODO
+        // remove_tmp_bufs($p1);
+        // -------------------------------------------------------------------->
+
+        
+        $log['body'][] = $file; // Battle rounds
+        $file = array();
+        
+        // TODO remove
+        if( $counter > 100 ) break;
     }
 }
 
 
-// // $p1 hits $p2 - only 1 hit!
+
+// sort players by initiative
+function players_initiative(&$pls){
+
+    $ci = count($pls);
+    for( $i = 0; $i < $ci; $i++ ){
+        $init_zero = ( $pls[$i]['init'] < 10 ) ? '0' . $pls[$i]['init'] : $pls[$i]['init'];
+        $init[$i] = $init_zero . '_' . $i;
+    }
+    rsort($init);
+
+    return $init;
+}
+
+
+// $p1 hits $p2 - only 1 hit!
 function player_hit(&$p1, &$p2, &$log = array()){
 
     // Hit example ---------------------------------------------------------------->
@@ -172,8 +266,8 @@ function player_hit(&$p1, &$p2, &$log = array()){
     return true;
 }
 
-
-function battle(&$p1, &$p2, &$log = array()){
+// Another way to end battle
+function battle_test(&$p1, &$p2, &$log = array()){
 
     $game['rounds'] = false;
     // Battle --------------------------------------------------------------------->
