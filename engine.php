@@ -46,6 +46,7 @@ function init_player($id = false){
     $s['hp'] = 100; // health points
     $s['mp'] = 100; // mana points
     $s['ap'] = 100; // Action points
+    $s['ap'] = 100; // Action points
     // ------------------------------------------------------------------------>
     
     
@@ -227,41 +228,98 @@ function players_initiative(&$pls){
 }
 
 
+// Select player action
+function player_battle_actions($p1, $pls, $grp){
+    
+    
+    
+    return 'player_hit';
+    
+}
+
+
 // $p1 hits $p2 - only 1 hit!
-function player_hit(&$p1, &$p2, &$log = array()){
+function player_hit(&$p1, $grp, $pls, &$log = array()){
+    
+    // Init ------------------------------------------------------------------->
+    $msg    = array();
+    $struct = array();
+    $msg    = msg_fill($msg);
+    $cfg    = qdm_config();
+    $skills = &$p1['skills'];
+    $index  = $p1['index'];
+    
+    $op_index = qdm_find_opponent($pls, $grp, $index); // Now we must find opponent
+    $p2 = &$pls[$op_index];
+    // ------------------------------------------------------------------------>
+    
+    
+    // Recalc ----------------------------------------------------------------->
+    $p1_defense = $cfg['base_armor'] + $cfg['armors'][$p1['armor']]['ac'];
+    $p2_defense = $cfg['base_armor'] + $cfg['armors'][$p2['armor']]['ac'];
+    $weapon_id = $p1['weapon'];
 
-    // Hit example ---------------------------------------------------------------->
+    // $struct['d_hit'] = $hit;
+    // $struct['d_dmg'] = $dmg;
+    // $struct['d_def'] = $defense;
+
+    // $b_atk = $p1['atk'] + $p1['bonus']['atk'];
+    // $b_dmg = $p1['dmg'];
+    // $b_def = $p2['bonus']['def'];
+    // ------------------------------------------------------------------------>
+    
+    
+    // Add some bonus (from user structure) ----------------------------------->
+    // ------------------------------------------------------------------------>
+
+    
+    // Hit example ------------------------------------------------------------>
     // min accuracity  10% - 15%
-    $dex_bonus = 0.02;
-    $dif = abs($p1['dex']-$p2['dex']) * $dex_bonus; // 1 dex = 1% accuracy/evasion
-
+    $dex_bonus = $game['dex_bonus'];
+    $dif = $p1['dex']-$p2['dex'] * $dex_bonus; // 1 dex = 1% accuracy/evasion
+    
+    // Acc may be + and - (do not recalc it too eva)
     $p1['acc'] += $dif; // change p1 acc
 
-    $hit_chance = $p1['acc'] - $p2['eva']; // float 0,02356 
+    $hit_chance = $p1['acc'] - $p2['eva']; // float 0,02356
+    if( $hit_chance < 0.1 ) $hit_chance = 0.1; // min 10%
     
-    $hit = mt_frand();
+    // Rolls ------------------------------------------------------------------>
+    $hit   = mt_frand();
+    $dmg   = mt_rand(1, $cfg['weapons'][$weapon_id]['dmg']);
     $block = mt_frand();
+    $crit  = mt_frand();
+    // ------------------------------------------------------------------------>
 
     if( $hit_chance >= $hit ){
-        // Ok, player hitted his targer, now, opponent action
         
+        $log['miss'] = 0;
+        // TODO: check critical
+        
+        // Ok, player hit his target, now, opponent checks
         if( $p2['block'] >= $block ){ // opponent have blocked that hit!
-            // hit to block - to stamina and hp?
-            // Block decreases damage
-            $log[] = 'blocked';
+            
+            // Block removes half physic damage
+            $dmg = ceil($dmg/2);
+            
+            $p2['st'] -= $dmg;
+            $p2['hp'] -= $dmg;
+            
+            $log['dmg']   = $dmg;
+            $log['block'] = 1;
+            $log['block_msg'] = 1;
         }
         else{ // opponent haven`t blocked
             
             
-            $dmg = mt_rand(5+floor($p1['str']), 10+$p1['str']);
             $p2['hp'] -= $dmg;
-            $log[] = 'hit for ' . $dmg;
+            $log['dmg']   = $dmg;
             // it`s dirrect hit to hp
             // calc damage
         }
     }
-    else $log[] = 'miss';
-    // ---------------------------------------------------------------------------->
+    else $log['miss'] = 1;
+    // ------------------------------------------------------------------------>
 
     return true;
 }
@@ -270,7 +328,7 @@ function player_hit(&$p1, &$p2, &$log = array()){
 function battle_test(&$p1, &$p2, &$log = array()){
 
     $game['rounds'] = false;
-    // Battle --------------------------------------------------------------------->
+    // Battle ----------------------------------------------------------------->
     if( $game['rounds'] ) $counter = $game['rounds'];
     while( 1 ){ // yes, always!
         
@@ -283,7 +341,7 @@ function battle_test(&$p1, &$p2, &$log = array()){
         // }
         
         
-        // End condition --------------------------------------------------------->>
+        // End condition ----------------------------------------------------->>
         if( $game['rounds'] ){
             $counter--;
             if( $counter <= 0 ) break; // Round 0 - end of battle
@@ -291,9 +349,9 @@ function battle_test(&$p1, &$p2, &$log = array()){
         else{
             if( $p1['hp'] < 1 || $p2['hp'] < 1 ) break;
         }
-        // ----------------------------------------------------------------------->>
+        // ------------------------------------------------------------------->>
     }
-    // ---------------------------------------------------------------------------->
+    // ------------------------------------------------------------------------>
 
     d_echo('end of battle');
 }
