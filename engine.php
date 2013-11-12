@@ -243,6 +243,7 @@ function player_hit(&$p1, &$pls, $grp, &$log = array()){
     $hit_chance = $p1_acc - $p2['eva']; // float 0,02356
     if( $hit_chance < 0.1 ) $hit_chance = 0.1; // min 10%
     $cur_log['hit_chance'] = $hit_chance;
+    $cur_log['crit'] = 0;
     
     // Rolls ------------------------------------------------------------------>
     $hit   = mt_frand();
@@ -260,7 +261,7 @@ function player_hit(&$p1, &$pls, $grp, &$log = array()){
     if( $hit_chance >= $hit ){
         
         $cur_log['miss'] = 0;
-        // TODO: check critical
+        check_critical_hit($p1, $dmg, $cur_log);
         
         // Ok, player hit his target, now, opponent checks
         if( $p2['block'] >= $block ){ // opponent have blocked that hit!
@@ -513,22 +514,23 @@ function q1dm_one_hit(&$p1, &$grp, &$pls, &$file){
 //   true/false (if true it will owerwrite damage value)
 // notes:
 //  -
-function qdm1_battle_check_crit($hit, $player, &$dmg, $opp_defense){
+function check_critical_hit($player, &$dmg, &$log){
 
     $cfg = qdm_config();
     
     $crit_range = $cfg['weapons'][$player['weapon']]['crit_range'];
-    // Crit in %
-    // Base crit 5%
 
-    if( $hit >= $crit_range && $hit+$player['atk'] >= $opp_defense || $hit == 20 ){
-        $confirm = mt_rand(1, 20);
-        if( $confirm >= $opp_defense ){
+    $crit = mt_frand();
+    $log['crit_range'] = 0;
+    $log['crit_dice'] = $crit;
+    if( $crit <= $crit_range ){
 
-            $dmg = $dmg * $cfg['weapons'][$player['weapon']]['crit'];
-            return true;
-        }
+        $log['crit'] = 1;
+        $dmg = $dmg * $cfg['weapons'][$player['weapon']]['crit'];
+        return true;
     }
+
+    $log['crit'] = 0;
     return false;
 }
  
