@@ -264,7 +264,7 @@ function player_hit(&$p1, &$pls, $grp, &$log = array()){
         check_critical_hit($p1, $dmg, $cur_log);
         
         // Ok, player hit his target, now, opponent checks
-        if( $p2['block'] >= $block ){ // opponent have blocked that hit!
+        if( $p2['block'] >= $block && ($dmg/2) < $p2['st'] ){ // opponent have blocked that hit!
             
             // Block removes half physic damage
             $dmg = ceil($dmg/2);
