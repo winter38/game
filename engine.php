@@ -60,6 +60,13 @@ function battle($pls, $grp){
 
 
     $file['header']['teams'] = $grp;
+    $params = array();
+    $params['magick'] = array(); // magick stack
+
+    // in stack will be added casted magick
+    // check stack for simphony magick - then remove that spells from stack
+    // for check will be clossest?
+    
     // Sort by init, in reverse order ----------------------------------------->
     // this part can used, when there are many players  
     $init = players_initiative($pls);
@@ -133,7 +140,7 @@ function battle($pls, $grp){
             // TODO
             $action = player_battle_actions($p1, $pls, $grp);
             // Do it!
-            $action($p1, $pls, $grp, $log);
+            $action($p1, $pls, $grp, $log, $params);
             // ---------------------------------------------------------------->
             
         }
@@ -189,14 +196,14 @@ function player_battle_actions($p1, $pls, $grp){
 
 
 // $p1 hits $p2 - only 1 hit!
-function player_hit(&$p1, &$pls, $grp, &$log = array()){
+function player_hit(&$p1, &$pls, $grp, &$log, &$params){
     
     global $game;
 
     $cur_log = array();
     $cur_log['who'] = $p1['index'];
     $cur_log['who_hp'] = $p1['hp'];
-
+    $cur_log['who_st'] = $p1['st'];
 
 
     // Init ------------------------------------------------------------------->
@@ -209,9 +216,8 @@ function player_hit(&$p1, &$pls, $grp, &$log = array()){
     $op_index = qdm_find_opponent($pls, $grp, $index); // Now we must find opponent
     $p2 = &$pls[$op_index];
     $cur_log['target'] = $p2['index'];
-    $cur_log['target_hp'] = $p2['hp'];
     // ------------------------------------------------------------------------>
-    
+
     
     // Recalc ----------------------------------------------------------------->
     $p1_defense = $p1['ac'];
@@ -231,7 +237,13 @@ function player_hit(&$p1, &$pls, $grp, &$log = array()){
     // Add some bonus (from user structure) ----------------------------------->
     // ------------------------------------------------------------------------>
 
+
+    // magick ----------------------------------------------------------------->
+    $activate_magick = player_active_magick($p1, $log, $params);
+    // if( $activate_magick ) magick_simphony($p1, $pls, $log, $patams);    
+    // ------------------------------------------------------------------------>
     
+
     // Hit example ------------------------------------------------------------>
     // min accuracity  10% - 15%
     $dex_bonus = $game['dex_bonus'];
@@ -274,10 +286,9 @@ function player_hit(&$p1, &$pls, $grp, &$log = array()){
             $p2['hp'] -= $dmg;
             
             $cur_log['dmg']   = $dmg;
-            $cur_log['block'] = 1;
+            $cur_log['block'] = $dmg;
             $cur_log['block_msg'] = 1;
-            $cur_log['target_hp'] = $p2['hp'];
-            $cur_log['target_st'] = $p2['st'];
+            
         }
         else{ // opponent haven`t blocked
             
@@ -285,8 +296,6 @@ function player_hit(&$p1, &$pls, $grp, &$log = array()){
             
             $p2['hp'] -= $dmg;
             $cur_log['dmg']   = $dmg;
-            
-            $cur_log['target_st'] = $p2['st'];
             // it`s dirrect hit to hp
             // calc damage
         }
@@ -295,12 +304,62 @@ function player_hit(&$p1, &$pls, $grp, &$log = array()){
     // ------------------------------------------------------------------------>
 
     $cur_log['target_hp'] = $p2['hp'];
+    $cur_log['target_st'] = $p2['st'];
 
     $log[] = $cur_log;
 
     return true;
 }
 
+
+function player_active_magick($p1, $log, $params){
+
+    if( empty($p1['magick']) ) return false;
+    
+    $magick = $p1['magick'];
+    
+    $ci   = count($magick);
+    $keys = array_keys($magick);
+    $chances = array();
+    for($i = 0; $i < $ci; $i++){ 
+        
+        $key = $keys[$i];
+        $tmp = array();
+        $tmp['name'] = $key;
+        $tmp['chance'] = $magick[$key]['chance'];
+        $chances[] = $tmp;
+    }
+
+    $ci = count($chances);
+    $total_weight = 0;
+    $cum_weight = array();
+    for( $i = 0; $i < $ci; $i++ ){ 
+
+        $total_weight += $chances[$i]['chance']*100;
+        $cum_weight[] = $total_weight;
+
+    }
+
+    $select = mt_rand(1, $total_weight);
+
+    d_echo($cum_weight); die;
+
+    $ci = count($ci);
+    $index = NULL;
+    for( $i = $ci; $i > 0; $i-- ){ 
+        
+        if( $cum_weight[$i] >= $select_ore && $cum_weight[$i-1] < $select_ore ){
+            $index = $i;
+            break;
+        }
+        $index = 0;
+    }
+    $ore = $arr[$index];
+
+
+    d_echo($p1);
+
+}
 
 
 function armor($ac, $dmg){
