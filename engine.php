@@ -114,6 +114,7 @@ function battle($pls, $grp){
 
             // TMP buf - add to main structure and create buf array
             // at the end unset buf, and next time take main structure again
+            // Add tmp buff into buff stack, to each user (or users ids)
 
             // Trigger some skill action before hit --------------------------->
             // qdm_skill_second_breath($pls[$index], $grp, $pls, $file);
