@@ -112,7 +112,8 @@ function battle($pls, $grp){
             if( $pls[$index]['hp'] < 1 ) continue; // skip dead players
             $p1 = &$pls[$index];
 
-
+            // TMP buf - add to main structure and create buf array
+            // at the end unset buf, and next time take main structure again
 
             // Trigger some skill action before hit --------------------------->
             // qdm_skill_second_breath($pls[$index], $grp, $pls, $file);
@@ -438,7 +439,7 @@ function remove_tmp_bufs($params){
 }
 
 
-
+// Armor decrease damage
 function armor($ac, $dmg){
 
     $dmg -= $ac;
@@ -480,165 +481,6 @@ function battle_test(&$p1, &$p2, &$log = array()){
     d_echo('end of battle');
 }
 
-
-
-
-// qdm_one_hit()
-//   creates log - rolls, checks. statistic
-// parameters:
-//   $p1 - array - attacker
-//   $p2 - array - defender
-//   $grp - array - player groups
-//   $players - array - all playres in battle
-//   $file - array - log structure will be written there
-// return:
-//
-// notes:
-//  -
-function q1dm_one_hit(&$p1, &$grp, &$pls, &$file){
-
-    $msg    = array();
-    $struct = array();
-    $msg    = msg_fill($msg);
-    $cfg    = qdm_config();
-    $skills = &$p1['skills'];
-    $index  = $p1['index'];
-
-
-
-    $players = $pls; // !!! nedd p2 by link, but no players
-
-    $op_index = qdm_find_opponent($players, $grp, $index); // Now we must find opponent
-    $p2 = &$pls[$op_index];
-
-    $defense   = $cfg['base_armor'] + $cfg['armors'][$p2['armor']]['ac'];
-    $weapon_id = $p1['weapon'];
-
-    $dmg = mt_rand(1, $cfg['weapons'][$weapon_id]['dmg']);
-    $hit = mt_rand(1, 20);
-
-    $struct['d_hit'] = $hit;
-    $struct['d_dmg'] = $dmg;
-    $struct['d_def'] = $defense;
-
-    $b_atk = $p1['atk'] + $p1['bonus']['atk'];
-    $b_dmg = $p1['dmg'];
-    $b_def = $p2['bonus']['def'];
-
-
-    // Weapon skill damage bonus
-    if( isset($skills[$weapon_id]) && isset($skills[$weapon_id]['wep_dmg']) ){
-        $dmg   += $skills[$weapon_id]['wep_dmg'];
-        $b_dmg += $skills[$weapon_id]['wep_dmg'];
-    }
-    // Weapon skill atk bonus
-    if( isset($skills[$weapon_id]) && isset($skills[$weapon_id]['wep_atk']) ){
-        $hit    += $skills[$weapon_id]['wep_atk'];
-        $b_atk += $skills[$weapon_id]['wep_atk'];
-    }
-    
-    // TODO: add weapon skills!
-    // Create structure for log
-    $struct['p1']  = $p1['index'];
-    $struct['p2']  = $p2['index'];
-    $struct['d_hit+'] = $b_atk;
-    $struct['d_dmg+']   = $b_dmg;
-    $struct['crit_mod'] = $cfg['weapons'][$p1['weapon']]['crit'];
-
-    $del = ' ';
-    $eva = 0;
-
-    // TODO: add shield
-    $defense   = $cfg['base_armor'] + $cfg['armors'][$p2['armor']]['ac'] + $p2['nat_armor'] + $p2['dodge'] + $b_def;    // full def (eveision)
-    $block_def = $cfg['base_armor'] + $cfg['armors'][$p2['armor']]['ac'] + $p2['nat_armor'];                   // armor def
-    $miss_def  = $cfg['base_armor']  + $p2['nat_armor']; // base def
-    $struct['opp_def']  = $defense . '/' . $block_def . '/' . $miss_def;
-
-    $dmg  = $dmg + $b_dmg; // add bonus
-
-    $crit = qdm_battle_check_crit($hit, $p1, $dmg, $defense);
-    if( $crit ){
-        
-        $p1['stat']['crit_count']++;
-        if( $dmg > $p1['stat']['crit_dmg'] ) $p1['stat']['crit_dmg'] = $dmg; // max crit
-        $log_dmg = $dmg;
-        $struct['crit'] = 1;
-    }
-    else $struct['crit'] = 0; 
-    
-    $hit  = $hit + $b_atk; // add bonus to hit
-    //if( $player['skill'] == $player['weapon'] ){ $hit++; }                      // weapon skill
-
-    if( $hit >= $defense ){
-        // d_debug(1, 'Hit for -'.$dmg.' ('.$p2['hp'].'/'.$p2['max_hp'].')');
-        $p2['hp'] = $p2['hp'] - $dmg;
-        $p1['stat']['dmg']     += $dmg;
-        $p2['stat']['hp_lost'] += $dmg;
-        $struct['dmg']  = $dmg;
-        $msg_max_hit  = count($msg['hit'])-1;
-        $msg_max_crit = count($msg['crit'])-1;
-
-        if( $crit )  $struct['msg'] = mt_rand(0, $msg_max_crit); 
-        else         $struct['msg'] = mt_rand(0, $msg_max_hit); 
-
-        $p1['stat']['hits']++;
-    }
-    else{ // miss
-
-        if( $hit <= $miss_def ){
-            // Total miss
-            $p1['stat']['miss']++;
-            $struct['dmg'] = -1;
-        }
-        elseif( $hit <= $block_def ){
-            // Enemy blcked attack
-            $p2['stat']['block']++;
-            $struct['dmg'] = -2;
-        }
-        else{ // enemy evaded attack
-            $p2['stat']['eva']++;
-            $struct['dmg'] = -3;
-        }
-
-        $msg_max_miss  = count($msg['miss'])-1;
-        $struct['msg'] = mt_rand(0, $msg_max_miss);
-    }
-
-
-    // Count kills 
-    if( $p2['hp'] < 1 ){ 
-
-        // d_debug($p2, 'Dead ' . $p2['name']);
-        // d_debug($grp, 'grp');
-        $p1['kills'][] = $p2['index']; // frags
-        $left = count($grp[$p2['team']]); // Last player in this team
-
-        // Mark defeated player
-        if( $left > 1 ){
-
-            // find team index
-            $player_index = array_search($p2['index'], $grp[$p2['team']]);
-
-            // Unset defeated plyer from team
-            unset($grp[$p2['team']][$player_index]);
-            $grp[$p2['team']] = array_values($grp[$p2['team']]);
-
-        }
-        else unset($grp[$p2['team']]); // no players in team - remove team
-
-        // tmp - need to remove or replace while-cicle continue
-        unset($players[$p2['index']]);
-    }
-
-    $p2['stat']['defended']++;
-    $p1['stat']['atacked']++;
-    $struct['p2_hp']  = $p2['hp'];
-    $struct['p2_max_hp']  = $p2['max_hp'];
-    $struct['action'] = -1;
-
-    $file[] = $struct;
-} // qdm_log_hit
-
 // qdm_battle_check_crit()
 //   check critical for weapon
 // parameters:
@@ -669,5 +511,6 @@ function check_critical_hit($player, &$dmg, &$log){
     $log['crit'] = 0;
     return false;
 }
+ 
  
 ?>
