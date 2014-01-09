@@ -97,7 +97,7 @@ function battle($pls, $grp){
         
         // Decide which action
         $ci = count($init);
-        for( $i = 0; $i < $ci; $i++ ){ 
+        for( $i = 0; $i < $ci; $i++ ){
             
             $rounds_counter++;
             
@@ -239,8 +239,8 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
 
 
     // magick ----------------------------------------------------------------->
-    $activate_magick = player_active_magick($p1, $log, $params);
-    // if( $activate_magick ) magick_simphony($p1, $pls, $log, $patams);    
+    $activate_magick = player_active_magick($p1, $cur_log, $params);
+    if( $activate_magick ) magick_simphony($p1, $pls, $grp, $cur_log, $params);    
     // ------------------------------------------------------------------------>
     
 
@@ -312,12 +312,15 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
 }
 
 
-function player_active_magick($p1, $log, $params){
+function player_active_magick($p1, &$log, &$params){
+
+    $log['magick'] = false;
 
     if( empty($p1['magick']) ) return false;
     
     $magick = $p1['magick'];
     
+    // Take all known magick -------------------------------------------------->
     $ci   = count($magick);
     $keys = array_keys($magick);
     $chances = array();
@@ -327,39 +330,113 @@ function player_active_magick($p1, $log, $params){
         $tmp = array();
         $tmp['name'] = $key;
         $tmp['chance'] = $magick[$key]['chance'];
+        $tmp['weight'] = $magick[$key]['weight'];
         $chances[] = $tmp;
     }
+    // ------------------------------------------------------------------------>
 
+
+    // Calc total weight and select among them -------------------------------->
     $ci = count($chances);
     $total_weight = 0;
     $cum_weight = array();
     for( $i = 0; $i < $ci; $i++ ){ 
 
-        $total_weight += $chances[$i]['chance']*100;
+        $total_weight += $chances[$i]['weight']*100;
         $cum_weight[] = $total_weight;
 
     }
 
     $select = mt_rand(1, $total_weight);
+    // ------------------------------------------------------------------------>
+    
 
-    d_echo($cum_weight); die;
-
+    // Select magick ---------------------------------------------------------->
     $ci = count($ci);
     $index = NULL;
     for( $i = $ci; $i > 0; $i-- ){ 
         
-        if( $cum_weight[$i] >= $select_ore && $cum_weight[$i-1] < $select_ore ){
+        if( $cum_weight[$i] >= $select && $cum_weight[$i-1] < $select ){
             $index = $i;
             break;
         }
         $index = 0;
     }
-    $ore = $arr[$index];
+
+    // ------------------------------------------------------------------------>
+
+    $cur = $magick[$keys[$index]];   
+    $cast = mt_frand();
+
+    // Chance to activate magick
+    if( $cast > $cur['chance'] ) return false; // No magick
 
 
-    d_echo($p1);
+    // Log -------------------------------------------------------------------->
+    $dmg = mt_rand($cur['dmg_min'], $cur['dmg_max']);
+    $cur['dmg'] = $dmg;
+    // $cur['target'] = '';
+
+    $params['stack'][] = $cur;
+    
+
+    // $log['magick'] = $cur;
+    // ------------------------------------------------------------------------>
+
+    return $cur;
+}
+
+
+function magick_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
+
+    $ci   = count($params['stack']);
+    $last = $ci - 1;
+
+    $magick = $params['stack'][$last];
+    $dmg    = $magick['dmg'];
+
+
+    $cur = $magick;
+
+    // Find target ------------------------------------------------------------>
+    $index  = $p1['index'];
+    $op_index = qdm_find_opponent($pls, $grp, $index); // Now we must find opponent
+    $p2 = &$pls[$op_index];
+    $cur_log['target'] = $p2['index'];
+
+    $p2['hp'] -= $dmg;
+    $p1['st'] -= round($dmg/2);
+    // ------------------------------------------------------------------------>
+
+    $cur['dmg'] = $dmg;
+    $cur['target'] = $p2['index'];
+
+    $cur_log['magick'] = $cur;
+}
+
+// Remove bufs that lost their effect
+// Decrease buf counter
+function remove_tmp_bufs($params){
+
+    if( !isset($params['buf']) ) return true; // no buf
+
+    $ci = count($params['buf']);
+    for($i = 0; $i < $ci; $i++){ 
+        
+        $cur_buf = &$params['buf'][$i];
+
+        $cur_buf['counter']--;
+        if( $cur_buf < 1 ){
+            unset($cur_buf);
+            unset($params['buf'][$i]);
+        }
+
+    }
+
+    $params['buf'] = array_values($params['buf']);
 
 }
+
 
 
 function armor($ac, $dmg){
