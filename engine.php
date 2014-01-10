@@ -61,12 +61,12 @@ function battle($pls, $grp){
 
     $file['header']['teams'] = $grp;
     $params = array();
-    $params['magick'] = array(); // magick stack
+    $params['magic'] = array(); // magic stack
     $params['buf']    = array(); // buf stack
 
-    // in stack will be added casted magick
-    // check stack for simphony magick - then remove that spells from stack
-    // for check will be clossest?
+    // in stack will be added casted magic
+    // check stack for simphony magic - then remove that spells from stack
+    // for check will be closest?
     
     // Sort by init, in reverse order ----------------------------------------->
     // this part can used, when there are many players  
@@ -229,8 +229,8 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
     
     
     // Recalc ----------------------------------------------------------------->
-    $p1_defense = $p1['ac'];
-    $p2_defense = $p2['ac'];
+    $p1_defense = $p1['ac'] + $p1['tmp']['ac'];
+    $p2_defense = $p2['ac'] + $p2['tmp']['ac'];
     $weapon_id  = $p1['weapon'];
 
     // $struct['d_hit'] = $hit;
@@ -247,28 +247,28 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
     // ------------------------------------------------------------------------>
 
 
-    // magick ----------------------------------------------------------------->
-    $activate_magick = player_active_magick($p1, $cur_log, $params);
-    if( $activate_magick ) magick_simphony($p1, $pls, $grp, $cur_log, $params);    
+    // magic ------------------------------------------------------------------>
+    $activate_magic = player_active_magic($p1, $cur_log, $params);
+    if( $activate_magic ) magic_simphony($p1, $pls, $grp, $cur_log, $params);    
     // ------------------------------------------------------------------------>
     
 
     // Hit example ------------------------------------------------------------>
     // min accuracity  10% - 15%
     $dex_bonus = $game['dex_bonus'];
-    $dif = ($p1['dex']-$p2['dex']) * $dex_bonus; // 1 dex = 1% accuracy/evasion
+    $dif = (($p1['dex'] + $p1['tmp']['dex']) - ($p2['dex'] + $p2['tmp']['dex'])) * $dex_bonus; // 1 dex = 1% accuracy/evasion
 
     // Acc may be + and - (do not recalc it too eva)
-    $p1_acc = $p1['acc'] + $dif; // change p1 acc
+    $p1_acc = $p1['acc'] + $p1['tmp']['acc'] + $dif; // change p1 acc
 
-    $hit_chance = $p1_acc - $p2['eva']; // float 0,02356
+    $hit_chance = $p1_acc - $p2['eva'] - $p2['tmp']['eva']; // float 0,02356
     if( $hit_chance < 0.1 ) $hit_chance = 0.1; // min 10%
     $cur_log['hit_chance'] = $hit_chance;
     $cur_log['crit'] = 0;
     
     // Rolls ------------------------------------------------------------------>
     $hit   = mt_frand();
-    $dmg   = mt_rand(1, $cfg['weapons'][$weapon_id]['dmg']) + $p1['dmg'];
+    $dmg   = mt_rand(1, $cfg['weapons'][$weapon_id]['dmg']) + $p1['dmg'] + $p1['tmp']['dmg'];
     $block = mt_frand();
     $crit  = mt_frand();
 
@@ -326,25 +326,25 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
 }
 
 
-function player_active_magick($p1, &$log, &$params){
+function player_active_magic($p1, &$log, &$params){
 
-    $log['magick'] = false;
+    $log['magic'] = false;
 
-    if( empty($p1['magick']) ) return false;
+    if( empty($p1['magic']) ) return false;
     
-    $magick = $p1['magick'];
+    $magic = $p1['magic'];
     
-    // Take all known magick -------------------------------------------------->
-    $ci   = count($magick);
-    $keys = array_keys($magick);
+    // Take all known magic --------------------------------------------------->
+    $ci   = count($magic);
+    $keys = array_keys($magic);
     $chances = array();
     for($i = 0; $i < $ci; $i++){ 
         
         $key = $keys[$i];
         $tmp = array();
         $tmp['name'] = $key;
-        $tmp['chance'] = $magick[$key]['chance'];
-        $tmp['weight'] = $magick[$key]['weight'];
+        $tmp['chance'] = $magic[$key]['chance'];
+        $tmp['weight'] = $magic[$key]['weight'];
         $chances[] = $tmp;
     }
     // ------------------------------------------------------------------------>
@@ -365,7 +365,7 @@ function player_active_magick($p1, &$log, &$params){
     // ------------------------------------------------------------------------>
     
 
-    // Select magick ---------------------------------------------------------->
+    // Select magic ----------------------------------------------------------->
     $ci = count($ci);
     $index = NULL;
     for( $i = $ci; $i > 0; $i-- ){ 
@@ -379,11 +379,11 @@ function player_active_magick($p1, &$log, &$params){
 
     // ------------------------------------------------------------------------>
 
-    $cur = $magick[$keys[$index]];   
+    $cur = $magic[$keys[$index]];   
     $cast = mt_frand();
 
-    // Chance to activate magick
-    if( $cast > $cur['chance'] ) return false; // No magick
+    // Chance to activate magic
+    if( $cast > $cur['chance'] ) return false; // No magic
 
 
     // Log -------------------------------------------------------------------->
@@ -394,23 +394,23 @@ function player_active_magick($p1, &$log, &$params){
     $params['stack'][] = $cur;
     
 
-    // $log['magick'] = $cur;
+    // $log['magic'] = $cur;
     // ------------------------------------------------------------------------>
 
     return $cur;
 }
 
 
-function magick_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
+function magic_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
 
     $ci   = count($params['stack']);
     $last = $ci - 1;
 
-    $magick = $params['stack'][$last];
-    $dmg    = $magick['dmg'];
+    $magic = $params['stack'][$last];
+    $dmg    = $magic['dmg'];
 
 
-    $cur = $magick;
+    $cur = $magic;
 
     // Find target ------------------------------------------------------------>
     $index  = $p1['index'];
@@ -425,7 +425,7 @@ function magick_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
     $cur['dmg'] = $dmg;
     $cur['target'] = $p2['index'];
 
-    $cur_log['magick'] = $cur;
+    $cur_log['magic'] = $cur;
 }
 
 
@@ -465,6 +465,7 @@ function add_buf(&$p, $params){
         
         if( !in_array($p['index'], $cur_buf['ids']) ) continue; // do not affect current user
         
+        // Apply effects to user tmp stats
         $stat_keys = array_keys($cur_buf['effect']);
         $cj = count($stat_keys);
         for( $j = 0; $j < $cj; $j++ ){
