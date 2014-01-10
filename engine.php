@@ -62,6 +62,7 @@ function battle($pls, $grp){
     $file['header']['teams'] = $grp;
     $params = array();
     $params['magick'] = array(); // magick stack
+    $params['buf']    = array(); // buf stack
 
     // in stack will be added casted magick
     // check stack for simphony magick - then remove that spells from stack
@@ -91,7 +92,7 @@ function battle($pls, $grp){
 
         
         // Group attack -------------------------------------------->
-        // TODO
+        // TODO - maybe
         // --------------------------------------------------------->
 
         
@@ -219,12 +220,18 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
     $p2 = &$pls[$op_index];
     $cur_log['target'] = $p2['index'];
     // ------------------------------------------------------------------------>
-
+    
+    
+    // Apply bufs ------------------------------------------------------------->
+    add_buf($p1, $params);
+    add_buf($p2, $params);
+    // ------------------------------------------------------------------------>
+    
     
     // Recalc ----------------------------------------------------------------->
     $p1_defense = $p1['ac'];
     $p2_defense = $p2['ac'];
-    $weapon_id = $p1['weapon'];
+    $weapon_id  = $p1['weapon'];
 
     // $struct['d_hit'] = $hit;
     // $struct['d_dmg'] = $dmg;
@@ -307,6 +314,11 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
 
     $cur_log['target_hp'] = $p2['hp'];
     $cur_log['target_st'] = $p2['st'];
+    
+    // Unset bufs ------------------------------------------------------------->
+    unset($p1['tmp']);
+    unset($p2['tmp']);
+    // ------------------------------------------------------------------------>
 
     $log[] = $cur_log;
 
@@ -416,6 +428,8 @@ function magick_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
     $cur_log['magick'] = $cur;
 }
 
+
+
 // Remove bufs that lost their effect
 // Decrease buf counter
 function remove_tmp_bufs($params){
@@ -437,6 +451,30 @@ function remove_tmp_bufs($params){
 
     $params['buf'] = array_values($params['buf']);
 
+}
+
+
+// Fill player with tmp buf values
+function add_buf(&$p, $params){
+    
+    
+    $ci = count($params['buf']);
+    for( $i = 0; $i < $ci; $i++ ){
+    
+        $cur_buf = $params['buf'][$i];
+        
+        if( !in_array($p['index'], $cur_buf['ids']) ) continue; // do not affect current user
+        
+        $stat_keys = array_keys($cur_buf['effect']);
+        $cj = count($stat_keys);
+        for( $j = 0; $j < $cj; $j++ ){
+            $key = $stat_keys[$i];
+            if( !isset($p['tmp'][$key]) ) $p['tmp'][$key] = 0;
+            $p['tmp'][$key] += $cur_buf['effect'][$key];
+        }
+    }
+    
+    return true;
 }
 
 
