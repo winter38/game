@@ -52,6 +52,19 @@ $grp[1][] = 1;
 battle($pls, $grp);
 
 
+// TODO add element resistance
+// fire > earth > air > air > water >
+// light >< dark
+// $p['resist_fire']
+// $p['resist_water']
+// $p['resist_air']
+// $p['resist_earh']
+// $p['resist_dark']
+// $p['resist_light']
+
+
+
+
 // Full battle
 function battle($pls, $grp){
 
@@ -407,7 +420,7 @@ function magic_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
     $last = $ci - 1;
 
     $magic = $params['stack'][$last];
-    $dmg    = $magic['dmg'];
+    $dmg   = $magic['dmg'];
 
 
     $cur = $magic;
@@ -446,11 +459,9 @@ function remove_tmp_bufs($params){
             unset($cur_buf);
             unset($params['buf'][$i]);
         }
-
     }
 
     $params['buf'] = array_values($params['buf']);
-
 }
 
 
