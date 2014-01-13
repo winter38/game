@@ -211,6 +211,7 @@ function player_battle_actions($p1, $pls, $grp){
 }
 
 
+
 // $p1 hits $p2 - only 1 hit!
 function player_hit(&$p1, &$pls, $grp, &$log, &$params){
     
@@ -329,8 +330,8 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
     $cur_log['target_st'] = $p2['st'];
     
     // Unset bufs ------------------------------------------------------------->
-    unset($p1['tmp']);
-    unset($p2['tmp']);
+    array_items_to_zero($p1['tmp']);
+    array_items_to_zero($p2['tmp']);
     // ------------------------------------------------------------------------>
 
     $log[] = $cur_log;
@@ -405,7 +406,11 @@ function player_active_magic($p1, &$log, &$params){
     // $cur['target'] = '';
 
     $params['stack'][] = $cur;
+
     
+
+    // if( isset($cur['duration'] )
+
 
     // $log['magic'] = $cur;
     // ------------------------------------------------------------------------>
@@ -439,6 +444,7 @@ function magic_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
     $cur['target'] = $p2['index'];
 
     $cur_log['magic'] = $cur;
+
 }
 
 
@@ -489,6 +495,20 @@ function add_buf(&$p, $params){
     return true;
 }
 
+
+function array_items_to_zero(&$ar){
+
+    $keys = array_keys($ar);
+    $ci = count($ar);
+    for($i = 0; $i < $ci; $i++) { 
+        
+        $key = $keys[$i];
+        if( !is_array($ar[$key]) ) $ar[$key] = 0;
+        else array_items_to_zero($ar[$key]);
+    }
+
+    return true;
+}
 
 // Armor decrease damage
 function armor($ac, $dmg){
