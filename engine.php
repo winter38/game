@@ -75,7 +75,7 @@ function battle($pls, $grp){
     $file['header']['teams'] = $grp;
     $params = array();
     $params['magic'] = array(); // magic stack
-    $params['buf']    = array(); // buf stack
+    $params['buf']   = array(); // buf stack
 
     // in stack will be added casted magic
     // check stack for simphony magic - then remove that spells from stack
@@ -408,8 +408,11 @@ function player_active_magic($p1, &$log, &$params){
     $params['stack'][] = $cur;
 
     
-
-    // if( isset($cur['duration'] )
+    // Magic with duration
+    if( isset($cur['duration']) ){
+        
+        $params['buf'][] = $cur;
+    }
 
 
     // $log['magic'] = $cur;
@@ -495,7 +498,8 @@ function add_buf(&$p, $params){
     return true;
 }
 
-
+// Fill all array items with zero
+// Set tmp bonuses to initial state
 function array_items_to_zero(&$ar){
 
     $keys = array_keys($ar);
