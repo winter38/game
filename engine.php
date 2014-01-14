@@ -589,3 +589,11 @@ function check_critical_hit($player, &$dmg, &$log){
  
  
 ?>
+
+Round n
+|_ Player n
+|    |- Hit who
+|    |_ Casted magic + dmg
+|    |_ bufs + status
+|
+|- Player n
