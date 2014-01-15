@@ -137,6 +137,15 @@ function init_player($id = false){
     $magic['ice']['duration']  = 3;
     $magic['ice']['chance']  = 0.1;
     $magic['ice']['weight']  = 0.1;
+    
+    $magic['earth_shield']['id'] = 'poison_1';
+    $magic['earth_shield']['name'] = 'Каменный щит';
+    $magic['earth_shield']['effect']['ac'] = 2;
+    $magic['earth_shield']['target']  = 0; // self!
+    $magic['earth_shield']['duration']  = 3;
+    $magic['earth_shield']['chance']  = 0.1;
+    $magic['earth_shield']['weight']  = 0.1;
+    
     $s['magic'] = $magic;
     // ------------------------------------------------------------------------>
 
