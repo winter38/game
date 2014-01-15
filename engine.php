@@ -332,6 +332,9 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
     // Unset bufs ------------------------------------------------------------->
     array_items_to_zero($p1['tmp']);
     array_items_to_zero($p2['tmp']);
+    
+    unset($p1['status']);
+    unset($p2['status']);
     // ------------------------------------------------------------------------>
 
     $log[] = $cur_log;
@@ -407,14 +410,6 @@ function player_active_magic($p1, &$log, &$params){
 
     $params['stack'][] = $cur;
 
-    
-    // Magic with duration
-    if( isset($cur['duration']) ){
-        
-        $params['buf'][] = $cur;
-    }
-
-
     // $log['magic'] = $cur;
     // ------------------------------------------------------------------------>
 
@@ -429,22 +424,38 @@ function magic_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
 
     $magic = $params['stack'][$last];
     $dmg   = $magic['dmg'];
-
-
+    
     $cur = $magic;
-
-    // Find target ------------------------------------------------------------>
-    $index  = $p1['index'];
-    $op_index = qdm_find_opponent($pls, $grp, $index); // Now we must find opponent
-    $p2 = &$pls[$op_index];
-    $cur_log['target'] = $p2['index'];
-
-    $p2['hp'] -= $dmg;
-    $p1['st'] -= round($dmg/2);
+    
+    // Magic with duration ---------------------------------------------------->
+    if( isset($cur['duration']) ){
+        
+        $params['buf'][] = $cur;
+    }
     // ------------------------------------------------------------------------>
 
-    $cur['dmg'] = $dmg;
-    $cur['target'] = $p2['index'];
+    // Find target ------------------------------------------------------------>
+    if( $cur['target'] ){
+    
+        $index  = $p1['index'];
+        $op_index = qdm_find_opponent($pls, $grp, $index); // Now we must find opponent
+        $p2 = &$pls[$op_index];
+        $cur_log['target'] = $p2['index'];
+
+        $p2['hp'] -= $dmg;
+        $p1['st'] -= round($dmg/2);
+        
+        // log
+        $cur['dmg'] = $dmg;
+        $cur['target'] = $p2['index'];
+    }
+    else{ // Target self
+        $cur['target'] = $p1['index'];
+    }
+    // ------------------------------------------------------------------------>
+    
+    
+    
 
     $cur_log['magic'] = $cur;
 
@@ -493,6 +504,9 @@ function add_buf(&$p, $params){
             if( !isset($p['tmp'][$key]) ) $p['tmp'][$key] = 0;
             $p['tmp'][$key] += $cur_buf['effect'][$key];
         }
+        
+        // Show buf icons
+        $p['status'][] = $cur_buf;
     }
     
     return true;
