@@ -4,7 +4,7 @@ include_once 'config.php';
 inc_fl_lib('qdm.php');
 inc_fl_lib('qdm/qdm_cfg.php');
 inc_fl_lib('html.php');
-
+// Not test!
 function mt_frand(){
     return mt_rand() / mt_getrandmax();
 }
