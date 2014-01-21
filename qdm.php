@@ -1137,6 +1137,4 @@ function qdm_stamina(&$player){
     return $stamina;
 }
 
-
-
 ?>
