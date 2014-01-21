@@ -4,7 +4,7 @@ include_once 'config.php';
 inc_fl_lib('qdm.php');
 inc_fl_lib('qdm/qdm_cfg.php');
 inc_fl_lib('html.php');
-// Not test!
+
 function mt_frand(){
     return mt_rand() / mt_getrandmax();
 }
@@ -237,8 +237,8 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
     
     
     // Apply bufs ------------------------------------------------------------->
-    add_buf($p1, $params);
-    add_buf($p2, $params);
+    add_buf($p1, $params, $cur_log);
+    add_buf($p2, $params, $cur_log);
     // ------------------------------------------------------------------------>
     
     
@@ -292,7 +292,7 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
     // ------------------------------------------------------------------------>
 
     
-
+    $cur_log['dmg'] = 0;
     if( $hit_chance >= $hit ){
         
         $cur_log['miss'] = 0;
@@ -308,9 +308,9 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
             $p2['st'] -= $dmg;
             $p2['hp'] -= $dmg;
             
-            $cur_log['dmg']   = $dmg;
             $cur_log['block'] = $dmg;
             $cur_log['block_msg'] = 1;
+            $cur_log['dmg'] = $dmg;
             
         }
         else{ // opponent haven`t blocked
@@ -318,12 +318,13 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
             $dmg = armor($p2_defense, $dmg);
             
             $p2['hp'] -= $dmg;
-            $cur_log['dmg']   = $dmg;
+            $cur_log['dmg'] = $dmg;
             // it`s dirrect hit to hp
             // calc damage
         }
     }
     else $cur_log['miss'] = 1;
+    
     // ------------------------------------------------------------------------>
 
     $cur_log['target_hp'] = $p2['hp'];
@@ -426,35 +427,42 @@ function magic_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
     $dmg   = $magic['dmg'];
     
     $cur = $magic;
-    
-    // Magic with duration ---------------------------------------------------->
-    if( isset($cur['duration']) ){
-        
-        $params['buf'][] = $cur;
-    }
-    // ------------------------------------------------------------------------>
+
 
     // Find target ------------------------------------------------------------>
     if( $cur['target'] ){
-    
-        $index  = $p1['index'];
-        $op_index = qdm_find_opponent($pls, $grp, $index); // Now we must find opponent
-        $p2 = &$pls[$op_index];
-        $cur_log['target'] = $p2['index'];
-
-        $p2['hp'] -= $dmg;
-        $p1['st'] -= round($dmg/2);
         
+        $ci = $cur['target'];
+        for($i = 0; $i < $ci; $i++){ 
+
+            $index  = $p1['index'];
+            $op_index = qdm_find_opponent($pls, $grp, $index); // Now we must find opponent
+            $p2 = &$pls[$op_index];
+            $cur_log['targets'][] = $p2['index'];
+
+            $p2['hp'] -= $dmg;
+            $p1['st'] -= round($dmg/2);
+            $cur['ids'][] = $p2['index'];
+        }
+
         // log
         $cur['dmg'] = $dmg;
-        $cur['target'] = $p2['index'];
+        
     }
     else{ // Target self
-        $cur['target'] = $p1['index'];
+        $cur['targets'][] = $p1['index'];
+        $cur['ids'][]     = $p2['index'];
     }
     // ------------------------------------------------------------------------>
     
-    
+        
+    // Magic with duration ---------------------------------------------------->
+    if( isset($cur['duration']) ){
+        $cur['effect'] = array(); //['hp'] = -1 * $cur['dmg'];
+        $params['buf'][] = $cur;
+        
+    }
+    // ------------------------------------------------------------------------>
     
 
     $cur_log['magic'] = $cur;
@@ -486,7 +494,7 @@ function remove_tmp_bufs($params){
 
 
 // Fill player with tmp buf values
-function add_buf(&$p, $params){
+function add_buf(&$p, $params, &$cur_log){
     
     
     $ci = count($params['buf']);
@@ -500,11 +508,23 @@ function add_buf(&$p, $params){
         $stat_keys = array_keys($cur_buf['effect']);
         $cj = count($stat_keys);
         for( $j = 0; $j < $cj; $j++ ){
-            $key = $stat_keys[$i];
+            $key = $stat_keys[$j];
             if( !isset($p['tmp'][$key]) ) $p['tmp'][$key] = 0;
             $p['tmp'][$key] += $cur_buf['effect'][$key];
         }
+
+
+        switch( $cur_buf['id'] ){
+            case 'poison_1':                
+
+                $cur_log['status'][] = $cur_buf;
+                break;
+            
+            default:
+                break;
+        }
         
+      
         // Show buf icons
         $p['status'][] = $cur_buf;
     }
