@@ -32,6 +32,7 @@ function init_player($id = false){
     
     $s['acc'] = 1;   // accuracy, default 100%
     $s['eva'] = 0.1; // evasion,  default 10%
+    $s['crit']  = 0  // critical chance in %
     $s['dodge'] = 0; // dodge ??? 
     $s['block'] = 0.3; // block, default 30%
     
