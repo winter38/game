@@ -5,6 +5,10 @@ function skill_example(){
     // Requirements ----------------------------------------------------------->
     // What need to get this skill - level, other skill, stat?
     // ------------------------------------------------------------------------>
+
+    // Return as list, do not add bonus to player ----------------------------->
+    // $list = 1;
+    // ------------------------------------------------------------------------>
     
     // Skill Name, description ------------------------------------------------>
     // ------------------------------------------------------------------------>
@@ -23,12 +27,11 @@ function skill_example(){
     
 }
 
-function skill_dagger_mastery(){
+function skill_dagger_mastery($p1){
     
     $s = array();
     
     // Requirements ----------------------------------------------------------->
-    // What need to get this skill - level, other skill, stat?
     // ------------------------------------------------------------------------>
     
     // Skill Name, description ------------------------------------------------>
@@ -64,11 +67,14 @@ function skill_dagger_mastery(){
                 'crit'  => 0.1,
                 'ref'   => 1,
             );
+    $s['level'] = $l;
     // ------------------------------------------------------------------------>
+
+    $return $s;
 }
 
 
-function skill_raiper_mastery(){
+function skill_raiper_mastery($p1){
     
     $s = array();
     
@@ -109,11 +115,11 @@ function skill_raiper_mastery(){
             );
     // ------------------------------------------------------------------------>
 
-
+    $return $s;
 }
 
 
-function skill_short_sword_mastery(){
+function skill_short_sword_mastery($p1){
     
     $s = array();
     
@@ -152,10 +158,12 @@ function skill_short_sword_mastery(){
                 'fort'  => 1,
             );
     // ------------------------------------------------------------------------>
+
+    $return $s;
 }
 
 
-function skill_long_sword_mastery(){
+function skill_long_sword_mastery($p1){
     
     $s = array();
     
@@ -192,10 +200,12 @@ function skill_long_sword_mastery(){
                 'acc' => 0.01,
             );
     // ------------------------------------------------------------------------>
+
+    $return $s;
 }
 
 
-function skill_bastard_mastery(){
+function skill_bastard_mastery($p1){
     
     $s = array();
     
@@ -235,10 +245,12 @@ function skill_bastard_mastery(){
                 'block' => 0.05,
             );
     // ------------------------------------------------------------------------>
+
+    $return $s;
 }
 
 
-function skill_poleaxe_mastery(){
+function skill_poleaxe_mastery($p1){
     
     $s = array();
     
@@ -277,6 +289,8 @@ function skill_poleaxe_mastery(){
                 'block' => 0.05,
             );
     // ------------------------------------------------------------------------>
+
+    $return $s;
 }
 
 
