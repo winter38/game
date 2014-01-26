@@ -6,6 +6,7 @@ inc_fl_lib('player.php');
 inc_fl_lib('skills/cfg_skill.php');
 inc_fl_lib('skill.php');
 inc_fl_lib('battle_steps.php');
+inc_fl_lib('skill/skill_weapon.php');
 
 // Fill basic player structure
 function init_player($id = false){
