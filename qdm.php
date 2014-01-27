@@ -107,6 +107,17 @@ function init_player($id = false){
 
     // Player skills ---------------------------------------------------------->
     $s['skills'] = array();
+    
+    // query from db
+    
+    $r[] = 'dagger_mastery';
+    $r[] = 'raiper_mastery';
+    $r[] = 'short_sword_mastery';
+    $r[] = 'long_sword_mastery';
+    $r[] = 'bastard_mastery';
+    $r[] = 'poleaxe_mastery';
+    
+    $s[] = $r[mt_rand(1, count($r))-1];
     // ------------------------------------------------------------------------>
 
 
