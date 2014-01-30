@@ -1,5 +1,9 @@
 <?php
 
+define('SPELL_TARGET_OPPONENT',  1);
+define('SPELL_TARGET_SELF',      2);
+define('SPELL_TARGET_ALLY',      3);
+
 
 
     // Init ------------------------------------------------------------------->
@@ -60,47 +64,90 @@ function magic_fire($magic, $skill = array()){
 }
 
 
-
-
-function player_magic_fill(){
+// p1 - needs if skills affects spells
+// magic.target - target count, that affects selected spell 
+// magic.target_type - type of targets 
+// magic.target_type = 1 - opponent
+// magic.target_type = 2 - self
+// magic.target_type = 3 - ally
+// magic.spell_type - what to do with spell
+// magic.spell_type = 'dmg' - dmg (hp) to player
+// magic.spell_type = 'buf' - stat increase
+// magic.duration  - will placed in bufs (duration battle rounds)
+// magic.effects   - will placed in bufs (duration battle rounds)
+// magic.weight    - spell weight (more chance spell will be selected) always selected 1 on all known
+// magic.chance    - chance to activate spell
+// magic.school    - chool of magic - some sort of type, will be used for resist (for sort spells by type)
+// magic.name      - name of spell
+function player_magic_fill($p1){
     
+    $tpl = array(); // defaul template
+    $tpl['dmg_min'] = 1;
+    $tpl['dmg_max'] = 4;
+    $tpl['target']  = 1;
+    $tpl['target_type']  = SPELL_TARGET_OPPONENT;
+    $tpl['chance']  = 0.1;
+    $tpl['weight']  = 0.1;
+    $tpl['spell_type'] = 'dmg';
     
     $magic = array();
-    $magic['fire']['id'] = 'fire_1';
-    $magic['fire']['name'] = 'Огонёк';
-    $magic['fire']['dmg_min'] = 1;
-    $magic['fire']['dmg_max'] = 4;
-    $magic['fire']['target']  = 1;
-    $magic['fire']['chance']  = 0.1;
-    $magic['fire']['weight']  = 0.1;
-
-    $magic['ice']['id'] = 'ice_1';
-    $magic['ice']['name'] = 'Лёд';
-    $magic['ice']['dmg_min'] = 1;
-    $magic['ice']['dmg_max'] = 4;
-    $magic['ice']['target']  = 1;
-    $magic['ice']['chance']  = 0.1;
-    $magic['ice']['weight']  = 0.1;
-
-
-    $magic['ice']['id'] = 'poison_1';
-    $magic['ice']['name'] = 'Яд';
-    $magic['ice']['dmg_min'] = 1;
-    $magic['ice']['dmg_max'] = 2;
-    $magic['ice']['target']  = 1;
-    $magic['ice']['duration']  = 3;
-    $magic['ice']['chance']  = 0.1;
-    $magic['ice']['weight']  = 0.1;
+    $tmp = $tpl;
+    $tmp['id'] = 'fire_1';
+    $tmp['school'][] = 'fire';
+    $tmp['name'] = 'Огонёк';
+    $tmp['dmg_min'] = 1;
+    $tmp['dmg_max'] = 4;
+    $magic[] = $tmp;
     
-    $magic['earth_shield']['id'] = 'poison_1';
-    $magic['earth_shield']['name'] = 'Каменный щит';
-    $magic['earth_shield']['effect']['ac'] = 2;
-    $magic['earth_shield']['target']  = 0; // self!
-    $magic['earth_shield']['duration']  = 3;
-    $magic['earth_shield']['chance']  = 0.1;
-    $magic['earth_shield']['weight']  = 0.1;
+    $tmp = $tpl;
+    $tmp['id'] = 'ice_1';
+    $tmp['name'] = 'Лёд';
+    $tmp['school'][]  = 'ice';
+    $tmp['dmg_min'] = 1;
+    $tmp['dmg_max'] = 4;
+    $tmp['target']  = 1;
+    $tmp['chance']  = 0.1;
+    $tmp['weight']  = 0.1;
+    $magic[] = $tmp;
+
+    $tmp = $tpl;
+    $tmp['id'] = 'poison_1';
+    $tmp['school'][] = 'poison'; // water or dark
+    $tmp['name'] = 'Яд';
+    $tmp['dmg_min'] = 1;
+    $tmp['dmg_max'] = 2;
+    $tmp['target']  = 1;
+    $tmp['duration']  = 3;
+    $tmp['chance']  = 0.1;
+    $tmp['weight']  = 0.1;
+    $magic[] = $tmp;
     
+    $tmp = $tpl;
+    $tmp['id'] = 'earth_shield';
+    $tmp['school'][] = 'earth';
+    $tmp['name'] = 'Каменный щит';
+    $tmp['effect']['ac'] = 2;
+    $tpl['target_type']  = SPELL_TARGET_SELF;
+    $tmp['target']  = 0; // self!
+    $tmp['duration']  = 3;
+    $tmp['chance']  = 0.1;
+    $tmp['weight']  = 0.1;
+    $magic[] = $tmp;
     
+ 
+    $tmp = $tpl;
+    $tmp['id'] = 'heal_1';
+    $tmp['school'][] = 'water';
+    $tmp['name'] = 'Лечение';
+    $tpl['target_type']  = SPELL_TARGET_ALLY;
+    $tmp['target']  = 0; // self!
+    $tmp['chance']  = 0.1;
+    $tmp['weight']  = 0.1;
+    $tmp['dmg_min'] = 1;
+    $tmp['dmg_max'] = 10;
+    $magic[] = $tmp;
+    
+    return $magic;
 }
 
 
