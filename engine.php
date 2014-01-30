@@ -427,46 +427,81 @@ function magic_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
     $dmg   = $magic['dmg'];
     
     $cur = $magic;
+    $dmg = 0;
+    
+    
+    // Spell Dmg -------------------------------------------------------------->
+    if( $cur['spell_type'] == 'dmg' ){
+        $dmg = mt_rand($cur['dmg_min'], $cur['dmg_max']);
+    }
+    // ------------------------------------------------------------------------>
+    
+    
+    // Spell consumes stamina ------------------------------------------------->
+    $p1['st'] -= round($cur['mp']);
+    // ------------------------------------------------------------------------>
 
 
     // Find target ------------------------------------------------------------>
-    if( $cur['target'] ){
+    // magic.target - target count, that affects selected spell 
+    // magic.target_type - type of targets 
+    // magic.target_type == 1 - opponent
+    // magic.target_type == 2 - self
+    // magic.target_type == 3 - ally    
+    
+    if( $cur['target'] > 0 ){ // target exists
         
         $ci = $cur['target'];
         for($i = 0; $i < $ci; $i++){ 
+            
+            switch( $cur['target_type'] ){
+                case SPELL_TARGET_OPPONENT:{
+                    $index  = $p1['index'];
+                    $op_index = qdm_find_opponent($pls, $grp, $index); // Now we must find opponent
+                    $p2 = &$pls[$op_index];
+                    $cur_log['targets'][] = $p2['index'];
 
-            $index  = $p1['index'];
-            $op_index = qdm_find_opponent($pls, $grp, $index); // Now we must find opponent
-            $p2 = &$pls[$op_index];
-            $cur_log['targets'][] = $p2['index'];
+                    if( $cur['spell_type'] == 'dmg' ) $p2['hp'] -= $dmg;
+                    $cur['ids'][] = $p2['index'];
+                    
+                    break;
+                }
+                case SPELL_TARGET_SELF:{
+                    
+                    if( $cur['spell_type'] == 'dmg' ) $p1['hp'] -= $dmg;
+                    $cur['targets'][] = $p1['index'];
+                    $cur['ids'][]     = $p2['index'];
+                    
+                    break;
+                }
+                case 3SPELL_TARGET_ALLY:{
+                    $index  = $p1['index'];
+                    $op_index = qdm_find_ally($pls, $grp, $index); // Now we must find ally
+                    $p2 = &$pls[$op_index];
+                    $cur_log['targets'][] = $p2['index'];
 
-            $p2['hp'] -= $dmg;
-            $p1['st'] -= round($dmg/2);
-            $cur['ids'][] = $p2['index'];
+                    if( $cur['spell_type'] == 'dmg' ) $p2['hp'] -= $dmg;
+                    $cur['ids'][] = $p2['index'];
+                    
+                    break;
+                }
+            }
         }
 
         // log
-        $cur['dmg'] = $dmg;
-        
-    }
-    else{ // Target self
-        $cur['targets'][] = $p1['index'];
-        $cur['ids'][]     = $p2['index'];
+        if( $cur['spell_type'] == 'dmg' ) $cur['dmg'] = $dmg;   
     }
     // ------------------------------------------------------------------------>
     
-        
+    
     // Magic with duration ---------------------------------------------------->
-    if( isset($cur['duration']) ){
-        $cur['effect'] = array(); //['hp'] = -1 * $cur['dmg'];
+    if( isset($cur['duration']) && $cur['duration'] ){
+        $cur['effect'] = array();
         $params['buf'][] = $cur;
-        
     }
     // ------------------------------------------------------------------------>
     
-
     $cur_log['magic'] = $cur;
-
 }
 
 
