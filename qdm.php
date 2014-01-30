@@ -123,43 +123,7 @@ function init_player($id = false){
 
     // Magick ----------------------------------------------------------------->
     // Magick will be filled according skills - just nedd skill mastery
-    $s['magic'] = array();
-    $magic = array();
-    $magic['fire']['id'] = 'fire_1';
-    $magic['fire']['name'] = 'Огонёк';
-    $magic['fire']['dmg_min'] = 1;
-    $magic['fire']['dmg_max'] = 4;
-    $magic['fire']['target']  = 1;
-    $magic['fire']['chance']  = 0.1;
-    $magic['fire']['weight']  = 0.1;
-
-    $magic['ice']['id'] = 'ice_1';
-    $magic['ice']['name'] = 'Лёд';
-    $magic['ice']['dmg_min'] = 1;
-    $magic['ice']['dmg_max'] = 4;
-    $magic['ice']['target']  = 1;
-    $magic['ice']['chance']  = 0.1;
-    $magic['ice']['weight']  = 0.1;
-
-
-    $magic['ice']['id'] = 'poison_1';
-    $magic['ice']['name'] = 'Яд';
-    $magic['ice']['dmg_min'] = 1;
-    $magic['ice']['dmg_max'] = 2;
-    $magic['ice']['target']  = 1;
-    $magic['ice']['duration']  = 3;
-    $magic['ice']['chance']  = 0.1;
-    $magic['ice']['weight']  = 0.1;
-    
-    $magic['earth_shield']['id'] = 'poison_1';
-    $magic['earth_shield']['name'] = 'Каменный щит';
-    $magic['earth_shield']['effect']['ac'] = 2;
-    $magic['earth_shield']['target']  = 0; // self!
-    $magic['earth_shield']['duration']  = 3;
-    $magic['earth_shield']['chance']  = 0.1;
-    $magic['earth_shield']['weight']  = 0.1;
-    
-    $s['magic'] = $magic;
+    $s['magic'] = player_magic_fill($p1);
     // ------------------------------------------------------------------------>
 
 
@@ -179,8 +143,6 @@ function init_player($id = false){
     $b['eva'] = 0;
     $b['acc'] = 0;
     $b['dmg'] = 0;
-
-
 
     return $s;
 }
