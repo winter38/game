@@ -79,11 +79,15 @@ function magic_fire($magic, $skill = array()){
 // magic.chance    - chance to activate spell
 // magic.school    - chool of magic - some sort of type, will be used for resist (for sort spells by type)
 // magic.name      - name of spell
+// magic.multiply  - how many time to take roll
+// magic.dmg       - static dmg will be added to
 function player_magic_fill($p1){
     
     $tpl = array(); // defaul template
     $tpl['dmg_min'] = 1;
     $tpl['dmg_max'] = 4;
+    $tpl['dmg+']    = 0;
+    $tmp['multiply'] = 1;
     $tpl['target']  = 1;
     $tpl['target_type']  = SPELL_TARGET_OPPONENT;
     $tpl['chance']  = 0.1;
@@ -91,8 +95,9 @@ function player_magic_fill($p1){
     $tpl['spell_type'] = 'dmg';
     
     $magic = array();
+    
     $tmp = $tpl;
-    $tmp['id'] = 'fire_1';
+    $tmp['id'] = 'fire';
     $tmp['school'][] = 'fire';
     $tmp['name'] = 'Огонёк';
     $tmp['dmg_min'] = 1;
@@ -100,11 +105,50 @@ function player_magic_fill($p1){
     $magic[] = $tmp;
     
     $tmp = $tpl;
-    $tmp['id'] = 'ice_1';
+    $tmp['id'] = 'flame';
+    $tmp['school'][] = 'fire';
+    $tmp['name'] = 'Пламя';
+    $tmp['dmg_min'] = 1;
+    $tmp['dmg_max'] = 4;
+    $tmp['multiply'] = 2;
+    $magic[] = $tmp;
+    
+    $tmp = $tpl;
+    $tmp['id'] = 'fire_flash';
+    $tmp['school'][] = 'fire';
+    $tmp['name'] = 'Пламя';
+    $tmp['dmg_min'] = 1;
+    $tmp['dmg_max'] = 4;
+    $tmp['multiply'] = 3;
+    $magic[] = $tmp;
+    
+    $tmp = $tpl;
+    $tmp['id'] = 'flame';
+    $tmp['school'][] = 'fire';
+    $tmp['name'] = 'Пламя';
+    $tmp['dmg_min'] = 1;
+    $tmp['dmg_max'] = 4;
+    $magic[] = $tmp;
+    
+    
+    $tmp = $tpl;
+    $tmp['id'] = 'ice';
     $tmp['name'] = 'Лёд';
     $tmp['school'][]  = 'ice';
     $tmp['dmg_min'] = 1;
     $tmp['dmg_max'] = 4;
+    $tmp['target']  = 1;
+    $tmp['chance']  = 0.1;
+    $tmp['weight']  = 0.1;
+    $magic[] = $tmp;
+    
+    $tmp = $tpl;
+    $tmp['id'] = 'ice_needle';
+    $tmp['name'] = 'Лёдeная игла';
+    $tmp['school'][]  = 'ice';
+    $tmp['dmg_min'] = 1;
+    $tmp['dmg_max'] = 4;
+    $tmp['multiply'] = 3;
     $tmp['target']  = 1;
     $tmp['chance']  = 0.1;
     $tmp['weight']  = 0.1;
