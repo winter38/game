@@ -23,8 +23,8 @@ define('SPELL_TARGET_ALLY',      3);
 
 
     // magic ------------------------------------------------------------------>
-    $activate_magic = player_active_magic($p1, $cur_log, $params); // Select magic
-    if( $activate_magic ) magic_simphony($p1, $pls, $grp, $cur_log, $params);    
+    // $activate_magic = player_active_magic($p1, $cur_log, $params); // Select magic
+    // if( $activate_magic ) magic_simphony($p1, $pls, $grp, $cur_log, $params);    
     // ------------------------------------------------------------------------>
     
 
@@ -55,11 +55,11 @@ function magic_fire($magic, $skill = array()){
         
         $key = $keys[$i];
         
-        if( isset($skill[$school][$key] ) $cur[$key] += $skill[$school][$key];
+        if( isset($skill[$school][$key]) ) $cur[$key] += $skill[$school][$key];
         
     }
     
-    if( isset($skils['fire']) )
+    // if( isset($skils['fire']) )
     
 }
 
@@ -87,13 +87,14 @@ function player_magic_fill($p1){
     $tpl['dmg_min'] = 1;
     $tpl['dmg_max'] = 4;
     $tpl['dmg+']    = 0;
-    $tmp['multiply'] = 1;
+    $tpl['multiply'] = 1;
     $tpl['target']  = 1;
-    $tpl['target_type']  = SPELL_TARGET_OPPONENT;
     $tpl['chance']  = 0.1;
     $tpl['weight']  = 0.1;
     $tpl['spell_type'] = 'dmg';
-    
+    $tpl['mp'] = 5;
+
+
     $magic = array();
     
     $tmp = $tpl;
@@ -102,7 +103,7 @@ function player_magic_fill($p1){
     $tmp['name'] = 'Огонёк';
     $tmp['dmg_min'] = 1;
     $tmp['dmg_max'] = 4;
-    $magic[] = $tmp;
+    // $magic[] = $tmp;
     
     $tmp = $tpl;
     $tmp['id'] = 'flame';
@@ -111,7 +112,7 @@ function player_magic_fill($p1){
     $tmp['dmg_min'] = 1;
     $tmp['dmg_max'] = 4;
     $tmp['multiply'] = 2;
-    $magic[] = $tmp;
+    // $magic[] = $tmp;
     
     $tmp = $tpl;
     $tmp['id'] = 'fire_flash';
@@ -120,7 +121,7 @@ function player_magic_fill($p1){
     $tmp['dmg_min'] = 1;
     $tmp['dmg_max'] = 4;
     $tmp['multiply'] = 3;
-    $magic[] = $tmp;
+    // $magic[] = $tmp;
     
     $tmp = $tpl;
     $tmp['id'] = 'flame';
@@ -128,7 +129,7 @@ function player_magic_fill($p1){
     $tmp['name'] = 'Пламя';
     $tmp['dmg_min'] = 1;
     $tmp['dmg_max'] = 4;
-    $magic[] = $tmp;
+    // $magic[] = $tmp;
     
     
     $tmp = $tpl;
@@ -140,7 +141,7 @@ function player_magic_fill($p1){
     $tmp['target']  = 1;
     $tmp['chance']  = 0.1;
     $tmp['weight']  = 0.1;
-    $magic[] = $tmp;
+    // $magic[] = $tmp;
     
     $tmp = $tpl;
     $tmp['id'] = 'ice_needle';
@@ -152,10 +153,10 @@ function player_magic_fill($p1){
     $tmp['target']  = 1;
     $tmp['chance']  = 0.1;
     $tmp['weight']  = 0.1;
-    $magic[] = $tmp;
+    // $magic[] = $tmp;
 
     $tmp = $tpl;
-    $tmp['id'] = 'poison_1';
+    $tmp['id'] = 'poison';
     $tmp['school'][] = 'poison'; // water or dark
     $tmp['name'] = 'Яд';
     $tmp['dmg_min'] = 1;
@@ -166,30 +167,29 @@ function player_magic_fill($p1){
     $tmp['weight']  = 0.1;
     $magic[] = $tmp;
     
-    $tmp = $tpl;
-    $tmp['id'] = 'earth_shield';
-    $tmp['school'][] = 'earth';
-    $tmp['name'] = 'Каменный щит';
-    $tmp['effect']['ac'] = 2;
-    $tpl['target_type']  = SPELL_TARGET_SELF;
-    $tmp['target']  = 0; // self!
-    $tmp['duration']  = 3;
-    $tmp['chance']  = 0.1;
-    $tmp['weight']  = 0.1;
-    $magic[] = $tmp;
+    // $tmp = $tpl;
+    // $tmp['id'] = 'earth_shield';
+    // $tmp['school'][] = 'earth';
+    // $tmp['name'] = 'Каменный щит';
+    // $tmp['effect']['ac'] = 2;
+    // $tmp['res'] = '+2 AC';
+    // $tmp['target']  = 1;
+    // $tmp['duration']  = 3;
+    // $tmp['chance']  = 0.1;
+    // $tmp['weight']  = 0.1;
+    // $magic[] = $tmp;
     
  
-    $tmp = $tpl;
-    $tmp['id'] = 'heal_1';
-    $tmp['school'][] = 'water';
-    $tmp['name'] = 'Лечение';
-    $tpl['target_type']  = SPELL_TARGET_ALLY;
-    $tmp['target']  = 0; // self!
-    $tmp['chance']  = 0.1;
-    $tmp['weight']  = 0.1;
-    $tmp['dmg_min'] = 1;
-    $tmp['dmg_max'] = 10;
-    $magic[] = $tmp;
+    // $tmp = $tpl;
+    // $tmp['id'] = 'heal';
+    // $tmp['school'][] = 'water';
+    // $tmp['name'] = 'Лечение';
+    // $tmp['target']  = 1;
+    // $tmp['chance']  = 0.1;
+    // $tmp['weight']  = 0.1;
+    // $tmp['dmg_min'] = 1;
+    // $tmp['dmg_max'] = 10;
+    // $magic[] = $tmp;
     
     return $magic;
 }
