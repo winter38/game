@@ -38,6 +38,7 @@ function skill_dagger_mastery($p1){
     $s['id']    = 'dagger_mastery';
     $s['name']  = 'Владение ножами';
     $s['descr'] = 'Умение обращатся с ножами';
+    $s['type']  = 'weapon';
     // ------------------------------------------------------------------------>
     
     // Skill initial bonus ---------------------------------------------------->
@@ -49,7 +50,7 @@ function skill_dagger_mastery($p1){
     // Skill levels and their bonus ------------------------------------------->
     $l = array();
     $l[1] = array(
-                'w_dmg' => 1,
+                'dmg+' => 1,
             );
     $l[2] = array(
                 'acc' => 0.01,
@@ -86,6 +87,7 @@ function skill_raiper_mastery($p1){
     $s['id']    = 'raiper_mastery';
     $s['name']  = 'Владение рапирой';
     $s['descr'] = 'Рапира?';
+    $s['type']  = 'weapon';
     // ------------------------------------------------------------------------>
     
     // Skill initial bonus ---------------------------------------------------->
@@ -97,7 +99,7 @@ function skill_raiper_mastery($p1){
     // Skill levels and their bonus ------------------------------------------->
     $l = array();
     $l[1] = array(
-                'w_dmg' => 1,
+                'dmg+' => 1,
             );
     $l[2] = array(
                 'acc' => 0.01,
@@ -113,6 +115,7 @@ function skill_raiper_mastery($p1){
                 'ref' => 1,
                 'crit' => 0.01,
             );
+    $s['level'] = $l;
     // ------------------------------------------------------------------------>
 
     return $s;
@@ -131,6 +134,7 @@ function skill_short_sword_mastery($p1){
     $s['id']    = 'short_sword_mastery';
     $s['name']  = 'Владение мечем';
     $s['descr'] = 'Умение обращатся с мечем';
+    $s['type']  = 'weapon';
     // ------------------------------------------------------------------------>
     
     // Skill initial bonus ---------------------------------------------------->
@@ -139,14 +143,14 @@ function skill_short_sword_mastery($p1){
     // Skill levels and their bonus ------------------------------------------->
     $l = array();
     $l[1] = array(
-                'w_dmg' => 1,
+                'dmg+' => 1,
             );
     $l[2] = array(
                 'acc' => 0.02,
             );
     $l[3] = array(
                 'dex'  => 1,
-                'srt'  => 1,
+                'str'  => 1,
             );
     $l[4] = array(
                 'con'   => 1,
@@ -157,6 +161,7 @@ function skill_short_sword_mastery($p1){
                 'ref'   => 1,
                 'fort'  => 1,
             );
+    $s['level'] = $l;
     // ------------------------------------------------------------------------>
 
     return $s;
@@ -175,6 +180,7 @@ function skill_long_sword_mastery($p1){
     $s['id']    = 'long_sword_mastery';
     $s['name']  = 'Владение длинным мечем';
     $s['descr'] = 'А меч действительно такой длинный как о нем говорят?';
+    $s['type']  = 'weapon';
     // ------------------------------------------------------------------------>
     
     // Skill initial bonus ---------------------------------------------------->
@@ -183,13 +189,13 @@ function skill_long_sword_mastery($p1){
     // Skill levels and their bonus ------------------------------------------->
     $l = array();
     $l[1] = array(
-                'w_dmg' => 1,
+                'dmg+' => 1,
             );
     $l[2] = array(
                 'acc' => 0.01,
             );
     $l[3] = array(
-                'w_dmg' => 1,
+                'dmg+' => 1,
             );
     $l[4] = array(
                 'str' => 1,
@@ -199,6 +205,7 @@ function skill_long_sword_mastery($p1){
                 'fort' => 1,
                 'acc' => 0.01,
             );
+    $s['level'] = $l;
     // ------------------------------------------------------------------------>
 
     return $s;
@@ -217,6 +224,7 @@ function skill_bastard_mastery($p1){
     $s['id']    = 'bastard_mastery';
     $s['name']  = 'Владение полуторным мечем';
     $s['descr'] = 'Он огромен!';
+    $s['type']  = 'weapon';
     // ------------------------------------------------------------------------>
     
     // Skill initial bonus ---------------------------------------------------->
@@ -225,13 +233,13 @@ function skill_bastard_mastery($p1){
     // Skill levels and their bonus ------------------------------------------->
     $l = array();
     $l[1] = array(
-                'w_dmg' => 1,
+                'dmg+' => 1,
             );
     $l[2] = array(
                 'dex' => 1,
             );
     $l[3] = array(
-                'w_dmg' => 1,
+                'dmg+' => 1,
                 'block' => 0.03,
             );
     $l[4] = array(
@@ -244,6 +252,7 @@ function skill_bastard_mastery($p1){
                 'dex' => 1,
                 'block' => 0.05,
             );
+    $s['level'] = $l;
     // ------------------------------------------------------------------------>
 
     return $s;
@@ -262,6 +271,7 @@ function skill_poleaxe_mastery($p1){
     $s['id']    = 'poleaxe_mastery';
     $s['name']  = 'Владение алебардой';
     $s['descr'] = 'Серкира!';
+    $s['type']  = 'weapon';
     // ------------------------------------------------------------------------>
     
     // Skill initial bonus ---------------------------------------------------->
@@ -270,10 +280,10 @@ function skill_poleaxe_mastery($p1){
     // Skill levels and their bonus ------------------------------------------->
     $l = array();
     $l[1] = array(
-                'w_dmg' => 1,
+                'dmg+' => 1,
             );
     $l[2] = array(
-                'srt' => 1,
+                'str' => 1,
             );
     $l[3] = array(
                 'con' => 1,
@@ -288,6 +298,7 @@ function skill_poleaxe_mastery($p1){
                 'con' => 1,
                 'block' => 0.05,
             );
+    $s['level'] = $l;
     // ------------------------------------------------------------------------>
 
     return $s;
