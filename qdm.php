@@ -6,7 +6,7 @@ inc_fl_lib('player.php');
 inc_fl_lib('skills/cfg_skill.php');
 inc_fl_lib('skill.php');
 inc_fl_lib('battle_steps.php');
-inc_fl_lib('skill/skill_weapon.php');
+inc_fl_lib('skills/skill_weapon.php');
 
 // Fill basic player structure
 function init_player($id = false){
@@ -33,7 +33,7 @@ function init_player($id = false){
     
     $s['acc'] = 1;   // accuracy, default 100%
     $s['eva'] = 0.1; // evasion,  default 10%
-    $s['crit']  = 0  // critical chance in %
+    $s['crit']  = 0; // critical chance in %
     $s['dodge'] = 0; // dodge ??? 
     $s['block'] = 0.3; // block, default 30%
     
@@ -93,8 +93,8 @@ function init_player($id = false){
     $s['hp_max'] = $s['hp'];
     $s['st_max'] = $s['st'];
 
-    $s['armor']  = mt_rand(1, count(qdm_cfg_wepons()));
-    $s['weapon'] = mt_rand(1, count(qdm_cfg_armors()));
+    $s['armor']  = mt_rand(1, count(qdm_cfg_armors()));
+    $s['weapon'] = mt_rand(1, count(qdm_cfg_wepons()));
     $s['ac']     = $cfg['armors'][$s['armor']]['ac'];
     // ------------------------------------------------------------------------>
     
@@ -117,15 +117,48 @@ function init_player($id = false){
     $r[] = 'bastard_mastery';
     $r[] = 'poleaxe_mastery';
     
-    $s[] = $r[mt_rand(1, count($r))-1];
+    $skill = 'skill_' . $r[mt_rand(1, count($r))-1];
+    $skill = $skill($s);
+    $skill['lvl'] = 10;
+    $s['skills'][] = $skill;
+
+    
+    $ci = count($s['skills']);
+    for($i = 0; $i < $ci; $i++){ 
+        
+        $cur_level = $s['skills'][$i]['lvl'];
+        if( $s['skills'][$i]['type'] == 'weapon' ){
+
+            if( $cfg['weapons'][$s['weapon']]['id'] !== $s['skills'][$i]['id'] ) break; // weapon dont macthed
+
+        }
+
+        for($j = 1; $j < $cur_level; $j++){ 
+            
+            if( !isset($s['skills'][$i]['level'][$j]) ) break; // no bonus for higher level
+
+
+            $keys = array_keys($s['skills'][$i]['level'][$j]);
+            $ck = count($keys);
+            for($k = 0; $k < $ck; $k++){ 
+
+                $key = $keys[$k];
+                $s[$key] += $s['skills'][$i]['level'][$j][$key];
+            }
+
+        }
+
+    }
     // ------------------------------------------------------------------------>
 
 
     // Magick ----------------------------------------------------------------->
     // Magick will be filled according skills - just nedd skill mastery
-    $s['magic'] = player_magic_fill($p1);
+    $s['magic'] = player_magic_fill($s);
     // ------------------------------------------------------------------------>
 
+
+    $s['buf_log'] = array();
 
     $s['tmp'] = array();
     $b = &$s['tmp'];
