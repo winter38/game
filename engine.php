@@ -4,6 +4,7 @@ include_once 'config.php';
 inc_fl_lib('qdm.php');
 inc_fl_lib('qdm/qdm_cfg.php');
 inc_fl_lib('html.php');
+inc_fl_lib('magic.php');
 
 function mt_frand(){
     return mt_rand() / mt_getrandmax();
@@ -29,8 +30,6 @@ $pls[] = init_player();
 $pls[] = init_player();
 
 $p1 = $p2 = $pls[0];
-$p1['dex'] = 10;
-$p2['dex'] = 8;
 $p1['name'] = 'player1';
 $p2['name'] = 'player2';
 $p1['index'] = 0;
@@ -164,7 +163,7 @@ function battle($pls, $grp){
         
         // End of round ------------------------------------------------------->
         // TODO
-        // remove_tmp_bufs($p1);
+        remove_tmp_bufs($params);
         // -------------------------------------------------------------------->
 
         $file['header']['pls'] = $pls;
@@ -240,11 +239,13 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
     add_buf($p1, $params, $cur_log);
     add_buf($p2, $params, $cur_log);
     // ------------------------------------------------------------------------>
-    
+
     
     // Recalc ----------------------------------------------------------------->
     $p1_defense = $p1['ac'] + $p1['tmp']['ac'];
     $p2_defense = $p2['ac'] + $p2['tmp']['ac'];
+    $cur_log['p1_ac'] = $p1_defense;
+    $cur_log['p2_ac'] = $p2_defense;
     $weapon_id  = $p1['weapon'];
 
     // $struct['d_hit'] = $hit;
@@ -267,6 +268,7 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
     // ------------------------------------------------------------------------>
     
 
+    $cur_log['dmg_log'] = '';
     // Hit example ------------------------------------------------------------>
     // min accuracity  10% - 15%
     $dex_bonus = $game['dex_bonus'];
@@ -286,6 +288,8 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
     $block = mt_frand();
     $crit  = mt_frand();
 
+    $cur_log['dmg_log'] .= '1d' . $cfg['weapons'][$weapon_id]['dmg'] . ' + ' . $p1['dmg'] . ' (player bonus as str) + '. $p1['tmp']['dmg'].'(buf) = ' . $dmg;
+
     $cur_log['hit']   = $hit;
     $cur_log['miss']  = 0;
     $cur_log['block'] = 0;
@@ -297,12 +301,18 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
         
         $cur_log['miss'] = 0;
         check_critical_hit($p1, $dmg, $cur_log);
+
+        if( $cur_log['crit'] ) $cur_log['dmg_log'] .= '* ' . $cfg['weapons'][$p1['weapon']]['crit'] . ' (crit)';
         
         // Ok, player hit his target, now, opponent checks
         if( $p2['block'] >= $block && ($dmg/2) < $p2['st'] ){ // opponent have blocked that hit!
             
             // Block removes half physic damage
             $dmg = ceil($dmg/2);
+
+            $cur_log['dmg_log'] .= '/2 (block)';
+            $cur_log['dmg_log'] .= ' - ' . $p2_defense . ' (ac)'; 
+            
             $dmg = armor($p2_defense, $dmg);
             
             $p2['st'] -= $dmg;
@@ -315,6 +325,7 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
         }
         else{ // opponent haven`t blocked
             
+            $cur_log['dmg_log'] .= ' - ' . $p2_defense . ' (ac)'; 
             $dmg = armor($p2_defense, $dmg);
             
             $p2['hp'] -= $dmg;
@@ -329,6 +340,7 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
 
     $cur_log['target_hp'] = $p2['hp'];
     $cur_log['target_st'] = $p2['st'];
+    $cur_log['buf_log'] = $p1['buf_log'];
     
     // Unset bufs ------------------------------------------------------------->
     array_items_to_zero($p1['tmp']);
@@ -336,6 +348,9 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
     
     unset($p1['status']);
     unset($p2['status']);
+
+    $p1['buf_log'] = array();
+    $p2['buf_log'] = array();
     // ------------------------------------------------------------------------>
 
     $log[] = $cur_log;
@@ -366,7 +381,7 @@ function player_active_magic($p1, &$log, &$params){
         $chances[] = $tmp;
     }
     // ------------------------------------------------------------------------>
-
+    
 
     // Calc total weight and select among them -------------------------------->
     $ci = count($chances);
@@ -384,8 +399,9 @@ function player_active_magic($p1, &$log, &$params){
     
 
     // Select magic ----------------------------------------------------------->
-    $ci = count($ci);
+    $ci = count($cum_weight)-1;
     $index = NULL;
+    $index = 0;
     for( $i = $ci; $i > 0; $i-- ){ 
         
         if( $cum_weight[$i] >= $select && $cum_weight[$i-1] < $select ){
@@ -402,11 +418,11 @@ function player_active_magic($p1, &$log, &$params){
 
     // Chance to activate magic
     if( $cast > $cur['chance'] ) return false; // No magic
-
+    // d_echo($cur, 'r');
 
     // Log -------------------------------------------------------------------->
-    $dmg = mt_rand($cur['dmg_min'], $cur['dmg_max']);
-    $cur['dmg'] = $dmg;
+    // $dmg = mt_rand($cur['dmg_min'], $cur['dmg_max']);
+    // $cur['dmg'] = $dmg;
     // $cur['target'] = '';
 
     $params['stack'][] = $cur;
@@ -424,19 +440,69 @@ function magic_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
     $last = $ci - 1;
 
     $magic = $params['stack'][$last];
-    $dmg   = $magic['dmg'];
-    
     $cur = $magic;
-    $dmg = 0;
-    
-    
-    // Spell Dmg -------------------------------------------------------------->
-    if( $cur['spell_type'] == 'dmg' ){
-        $dmg = mt_rand($cur['dmg_min'], $cur['dmg_max']);
+
+    switch ($cur['id']) {
+
+        case 'flame':
+        case 'fire_flash':
+        case 'ice_needle':
+        case 'ice':
+        case 'fire':{
+             
+            $ci = $cur['target'];
+            for($i = 0; $i < $ci; $i++){ 
+                
+                $index  = $p1['index'];
+                $op_index = qdm_find_opponent($pls, $grp, $index); // Now we must find opponent
+                $p2 = &$pls[$op_index];
+                $cur_log['targets'][] = $p2['index'];
+
+                $dmg = mt_rand($cur['dmg_min'], $cur['dmg_max']) * $cur['multiply'];
+
+                $p2['hp'] -= $dmg;
+                $cur['ids'][] = $p2['index'];
+                $cur['dmg'] = $dmg;
+            }
+
+            break;
+        }
+
+        case 'earth_shield':{
+
+            $cur['ids'][] = $p1['index'];
+            $params['buf'][] = $cur;
+            break;
+        }
+
+        case 'poison':{
+
+            $dmg = mt_rand($cur['dmg_min'], $cur['dmg_max']) * $cur['multiply'];
+            $cur['dmg'] = $dmg;
+            $cur['effect'] = array();
+            $cur['ids'][] = $p1['index'];
+            $params['buf'][] = $cur;
+            break;
+        }
+
+        case 'heal':
+
+            $dmg = mt_rand($cur['dmg_min'], $cur['dmg_max']);
+
+            $need_hp = $p1['hp_max'] - $p1['hp'];
+            if( $dmg > $need_hp ) $dmg = $need_hp;
+
+            $p1['hp'] += $dmg;
+            $cur['ids'][] = $p1['index'];
+            $cur['dmg'] = $dmg;
+
+            break;
+        
+        default:
+            # code...
+            break;
     }
-    // ------------------------------------------------------------------------>
-    
-    
+
     // Spell consumes stamina ------------------------------------------------->
     $p1['st'] -= round($cur['mp']);
     // ------------------------------------------------------------------------>
@@ -449,13 +515,15 @@ function magic_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
     // magic.target_type == 2 - self
     // magic.target_type == 3 - ally    
     
-    if( $cur['target'] > 0 ){ // target exists
+    if( 0 ){ // target exists
         
         $ci = $cur['target'];
         for($i = 0; $i < $ci; $i++){ 
             
             switch( $cur['target_type'] ){
+
                 case SPELL_TARGET_OPPONENT:{
+
                     $index  = $p1['index'];
                     $op_index = qdm_find_opponent($pls, $grp, $index); // Now we must find opponent
                     $p2 = &$pls[$op_index];
@@ -470,11 +538,12 @@ function magic_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
                     
                     if( $cur['spell_type'] == 'dmg' ) $p1['hp'] -= $dmg;
                     $cur['targets'][] = $p1['index'];
-                    $cur['ids'][]     = $p2['index'];
+                    $cur['ids'][]     = $p1['index'];
                     
                     break;
                 }
-                case 3SPELL_TARGET_ALLY:{
+                case SPELL_TARGET_ALLY:{
+
                     $index  = $p1['index'];
                     $op_index = qdm_find_ally($pls, $grp, $index); // Now we must find ally
                     $p2 = &$pls[$op_index];
@@ -487,19 +556,9 @@ function magic_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
                 }
             }
         }
-
-        // log
-        if( $cur['spell_type'] == 'dmg' ) $cur['dmg'] = $dmg;   
     }
     // ------------------------------------------------------------------------>
     
-    
-    // Magic with duration ---------------------------------------------------->
-    if( isset($cur['duration']) && $cur['duration'] ){
-        $cur['effect'] = array();
-        $params['buf'][] = $cur;
-    }
-    // ------------------------------------------------------------------------>
     
     $cur_log['magic'] = $cur;
 }
@@ -508,7 +567,7 @@ function magic_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
 
 // Remove bufs that lost their effect
 // Decrease buf counter
-function remove_tmp_bufs($params){
+function remove_tmp_bufs(&$params){
 
     if( !isset($params['buf']) ) return true; // no buf
 
@@ -517,8 +576,10 @@ function remove_tmp_bufs($params){
         
         $cur_buf = &$params['buf'][$i];
 
-        $cur_buf['counter']--;
-        if( $cur_buf < 1 ){
+        // d_echo($cur_buf);
+
+        $cur_buf['duration']--;
+        if( $cur_buf['duration'] < 0 ){
             unset($cur_buf);
             unset($params['buf'][$i]);
         }
@@ -539,10 +600,13 @@ function add_buf(&$p, $params, &$cur_log){
         
         if( !in_array($p['index'], $cur_buf['ids']) ) continue; // do not affect current user
         
+        $p['buf_log'] = array_merge($cur_buf['effect'], $p['buf_log']);
+
         // Apply effects to user tmp stats
         $stat_keys = array_keys($cur_buf['effect']);
         $cj = count($stat_keys);
         for( $j = 0; $j < $cj; $j++ ){
+
             $key = $stat_keys[$j];
             if( !isset($p['tmp'][$key]) ) $p['tmp'][$key] = 0;
             $p['tmp'][$key] += $cur_buf['effect'][$key];
@@ -550,7 +614,7 @@ function add_buf(&$p, $params, &$cur_log){
 
 
         switch( $cur_buf['id'] ){
-            case 'poison_1':                
+            case 'poison':                
 
                 $cur_log['status'][] = $cur_buf;
                 break;
