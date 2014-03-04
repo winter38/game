@@ -4,6 +4,65 @@ function mt_frand(){
     return mt_rand() / mt_getrandmax();
 }
 
+
+
+
+function tree_tis(){
+
+    $ar = array();
+    $ar['name'] = 'Тисовое дерево';
+	$ar['item_id'] = 1;
+	$ar['weight'] = 1;
+	$ar['chance'] = 1;
+    $ar['count_min'] = 1;
+    $ar['count_max'] = 2;
+    
+    
+    return $ar;
+}
+
+function tree_pihta(){
+
+    $ar = array();
+    $ar['name'] = 'Пихта';
+	$ar['item_id'] = 1;
+	$ar['weight'] = 1;
+	$ar['chance'] = 1;
+    $ar['count_min'] = 1;
+    $ar['count_max'] = 2;
+    $ar['hp'] = 5;
+    
+    return $ar;
+}
+
+function tree_sosna(){
+
+    $ar = array();
+    $ar['name'] = 'Сосна';
+	$ar['item_id'] = 1;
+	$ar['weight'] = 1;
+	$ar['chance'] = 1;
+    $ar['count_min'] = 1;
+    $ar['count_max'] = 2;
+    
+    return $ar;
+}
+
+function tree_el(){
+
+    $ar = array();
+    $ar['name'] = 'Ель';
+	$ar['item_id'] = 1;
+	$ar['weight'] = 1;
+	$ar['chance'] = 1;
+    $ar['count_min'] = 1;
+    $ar['count_max'] = 2;
+    $ar['hp'] = 10;
+    
+    return $ar;
+}
+
+
 function qdm_ores(){
 
 	$res = array();
