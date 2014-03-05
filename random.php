@@ -5,32 +5,80 @@ function mt_frand(){
 }
 
 
+function tree_tpl(){
+    
+    $res = array();
+    $ar['name'] = 'No name';  // name of item
+	$ar['item_id'] = 0;       // id for or from DB
+	$ar['weight'] = 1;        // to select among other items - more weight, more chance
+	$ar['chance'] = 1;        // chance to get this item (1 = 100%)
+    $ar['count_min'] = 1;     // Min items
+    $ar['count_max'] = 1;     // Max items
+    $ar['hp'] = 5;            // Durability of item (TBD)
+    
+    return $res;
+}
+
+
+function ore_tpl(){
+    
+    $res = array();
+    $ar['name'] = 'No name';  // name of item
+	$ar['item_id'] = 0;       // id for or from DB
+	$ar['weight'] = 1;        // to select among other items - more weight, more chance
+	$ar['chance'] = 1;        // chance to get this item (1 = 100%)
+    $ar['count_min'] = 1;     // Min items
+    $ar['count_max'] = 1;     // Max items
+    // $ar['hp'] = 5;            // Durability of item (TBD)
+    
+    return $res;
+}
+
+
+function herb_tpl(){
+    
+    $res = array();
+    $ar['name'] = 'No name';  // name of item
+	$ar['item_id'] = 0;       // id for or from DB
+	$ar['weight'] = 1;        // to select among other items - more weight, more chance
+	$ar['chance'] = 1;        // chance to get this item (1 = 100%)
+    $ar['count_min'] = 1;     // Min items
+    $ar['count_max'] = 1;     // Max items
+    // $ar['hp'] = 5;            // Durability of item (TBD)
+    
+    return $res;
+}
+
+
+function jewel_tpl(){
+    
+    $res = array();
+    $ar['name'] = 'No name';  // name of item
+	$ar['item_id'] = 0;       // id for or from DB
+	$ar['weight'] = 1;        // to select among other items - more weight, more chance
+	$ar['chance'] = 1;        // chance to get this item (1 = 100%)
+    $ar['count_min'] = 1;     // Min items
+    $ar['count_max'] = 1;     // Max items
+    // $ar['hp'] = 5;            // Durability of item (TBD)
+    
+    return $res;
+}
 
 
 function tree_tis(){
 
-    $ar = array();
+    $ar = tree_tpl();
     $ar['name'] = 'Тисовое дерево';
 	$ar['item_id'] = 1;
-	$ar['weight'] = 1;
-	$ar['chance'] = 1;
-    $ar['count_min'] = 1;
-    $ar['count_max'] = 2;
-    
     
     return $ar;
 }
 
 function tree_pihta(){
 
-    $ar = array();
+    $ar = tree_tpl();
     $ar['name'] = 'Пихта';
-	$ar['item_id'] = 1;
-	$ar['weight'] = 1;
-	$ar['chance'] = 1;
-    $ar['count_min'] = 1;
-    $ar['count_max'] = 2;
-    $ar['hp'] = 5;
+	$ar['item_id'] = 2;
     
     return $ar;
 }
@@ -39,11 +87,7 @@ function tree_sosna(){
 
     $ar = array();
     $ar['name'] = 'Сосна';
-	$ar['item_id'] = 1;
-	$ar['weight'] = 1;
-	$ar['chance'] = 1;
-    $ar['count_min'] = 1;
-    $ar['count_max'] = 2;
+	$ar['item_id'] = 3;
     
     return $ar;
 }
@@ -52,34 +96,198 @@ function tree_el(){
 
     $ar = array();
     $ar['name'] = 'Ель';
-	$ar['item_id'] = 1;
-	$ar['weight'] = 1;
-	$ar['chance'] = 1;
-    $ar['count_min'] = 1;
-    $ar['count_max'] = 2;
-    $ar['hp'] = 10;
+	$ar['item_id'] = 4;
     
     return $ar;
 }
 
 
-function qdm_ores(){
+// Ores ----------------------------------------------------------------------->
+function ore_stone(){
 
-	$res = array();
-	$ar = array();
+    $res = ore_tpl();
+	$res['name'] = 'Камень';
+	$res['item_id'] = 1; 
+    
+    return $res;
+}
+
+
+function ore_iron(){
+
+    $res = ore_tpl();
+	$res['name'] = 'Железная руда';
+	$res['item_id'] = 1; 
+    
+    return $res;
+}
+
+
+function ore_copper(){
+
+    $res = ore_tpl();
+	$res['name'] = 'Медная руда';
+	$res['item_id'] = 2; 
+    
+    return $res;
+}
+
+
+function ore_tin(){
+
+    $res = ore_tpl();
+	$res['name'] = 'Кристаллы касситерита'; // олово
+	$res['item_id'] = 3; 
+    
+    return $res;
+}
+
+
+
+function ore_silver(){
+
+    $res = ore_tpl();
+	$res['name'] = 'Серебряный самородок';
+	$res['item_id'] = 3; 
+    
+    return $res;
+}
+
+
+function ore_gold(){
+
+    $res = ore_tpl();
+	$res['name'] = 'Золотой самородок';
+	$res['item_id'] = 4; 
+    
+    return $res;
+}
+
+function ore_titan(){
+
+    $res = ore_tpl();
+	$res['name'] = 'Титанит (Титановая руда)';
+	$res['item_id'] = 5; 
+    
+    return $res;
+}
+
+function ore_titan(){
+
+    $res = ore_tpl();
+	$res['name'] = 'Титанит (Титановая руда)';
+	$res['item_id'] = 6; 
+    
+    return $res;
+}
+
+function ore_mithril(){
+
+    $res = ore_tpl();
+	$res['name'] = 'Мифриловая руда';
+	$res['item_id'] = 7; 
+    
+    return $res;
+}
+
+function ore_adamantin(){
+
+    $res = ore_tpl();
+	$res['name'] = 'Адамантин';
+	$res['item_id'] = 8; 
+    
+    return $res;
+}
+// ---------------------------------------------------------------------------->
+
+// 3 ores = bar
+
+// tin + coppen = bronze
+
+
+
+
+// Jewels --------------------------------------------------------------------->
+
+
+function jewel_crystal(){
+
+    $res = jewel_tpl();
+	$res['name'] = 'Кристалл';
+	$res['item_id'] = 1; 
+    
+    return $res;
+}
+
+
+function jewel_topaz(){
+
+    $res = jewel_tpl();
+	$res['name'] = 'Топаз';
+	$res['item_id'] = 2; 
+    
+    return $res;
+}
+
+function jewel_emerald(){
+
+    $res = jewel_tpl();
+	$res['name'] = 'Изумруд';
+	$res['item_id'] = 3; 
+    
+    return $res;
+}
+
+function jewel_ruby(){
+
+    $res = jewel_tpl();
+	$res['name'] = 'Рубин';
+	$res['item_id'] = 4; 
+    
+    return $res;
+}
+
+function jewel_diamond(){
+
+    $res = jewel_tpl();
+	$res['name'] = 'Алмаз';
+	$res['item_id'] = 5; 
+    
+    return $res;
+}
+
+function jewel_sapphire(){
+
+    $res = jewel_tpl();
+	$res['name'] = 'Сапфир';
+	$res['item_id'] = 6; 
+    
+    return $res;
+}
+
+// ---------------------------------------------------------------------------->
+
+function qdm_ores(){
+    
+    $res = array();
+	$ar = ore_tpl();
 	$ar['name'] = 'Медь';
 	$ar['item_id'] = 1; 
  	$ar['weight'] = 100;
 	$ar['chance'] = 0.6;
+    $ar['count_min'] = 1;
+    $ar['count_max'] = 2;
 
 
 	$res[] = $ar;
 
-
+    $ar = ore_tpl();
 	$ar['name'] = 'Железистый кварцит';
 	$ar['item_id'] = 2;
 	$ar['weight'] = 40;
 	$ar['chance'] = 0.4;
+    $ar['count_min'] = 1;
+    $ar['count_max'] = 2;
 
 
 	$res[] = $ar;
@@ -92,7 +300,7 @@ function qdm_ores(){
 function qdm_herbs(){
 
 	$res = array();
-	$ar = array();
+	$ar = herb_tpl();
 	$ar['name'] = 'Листья черного чая';
 	$ar['item_id'] = 1001; 
  	$ar['weight'] = 100;
@@ -101,7 +309,7 @@ function qdm_herbs(){
 
 	$res[] = $ar;
 
-
+    $ar = herb_tpl();
 	$ar['name'] = 'Листя зеленного чая';
 	$ar['item_id'] = 1002;
 	$ar['weight'] = 60;
