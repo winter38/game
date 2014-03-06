@@ -8,13 +8,15 @@ function mt_frand(){
 function tree_tpl(){
     
     $res = array();
-    $ar['name'] = 'No name';  // name of item
-	$ar['item_id'] = 0;       // id for or from DB
-	$ar['weight'] = 1;        // to select among other items - more weight, more chance
-	$ar['chance'] = 1;        // chance to get this item (1 = 100%)
-    $ar['count_min'] = 1;     // Min items
-    $ar['count_max'] = 1;     // Max items
-    $ar['hp'] = 5;            // Durability of item (TBD)
+    $res['name'] = 'No name';  // name of item
+	$res['item_id'] = 0;       // id for or from DB
+	$res['weight'] = 1;        // to select among other items - more weight, more chance
+	$res['chance'] = 1;        // chance to get this item (1 = 100%)
+    $res['count_min'] = 1;     // Min items
+    $res['count_max'] = 1;     // Max items
+    $res['hp'] = 5;            // Durability of item (TBD)
+    $res['price_min'] = 1;     // Min price - default price at shop
+    $res['price_max'] = 10;    // Max price - at shop with + at barter
     
     return $res;
 }
@@ -23,13 +25,31 @@ function tree_tpl(){
 function ore_tpl(){
     
     $res = array();
-    $ar['name'] = 'No name';  // name of item
-	$ar['item_id'] = 0;       // id for or from DB
-	$ar['weight'] = 1;        // to select among other items - more weight, more chance
-	$ar['chance'] = 1;        // chance to get this item (1 = 100%)
-    $ar['count_min'] = 1;     // Min items
-    $ar['count_max'] = 1;     // Max items
-    // $ar['hp'] = 5;            // Durability of item (TBD)
+    $res['name'] = 'No name';  // name of item
+	$res['item_id'] = 0;       // id for or from DB
+	$res['weight'] = 1;        // to select among other items - more weight, more chance
+	$res['chance'] = 1;        // chance to get this item (1 = 100%)
+    $res['count_min'] = 1;     // Min items
+    $res['count_max'] = 1;     // Max items
+    // $ar['hp'] = 5;          // Durability of item (TBD)
+    $res['price_min'] = 1;     // Min price - default price at shop
+    $res['price_max'] = 10;    // Max price - at shop with + at barter
+    
+    return $res;
+}
+
+function fruit_tpl(){
+    
+    $res = array();
+    $res['name'] = 'No name';  // name of item
+	$res['item_id'] = 0;       // id for or from DB
+	$res['weight'] = 1;        // to select among other items - more weight, more chance
+	$res['chance'] = 0.05;     // chance to get this item (1 = 100%)
+    $res['count_min'] = 1;     // Min items
+    $res['count_max'] = 1;     // Max items
+    $res['price_min'] = 1;     // Min price - default price at shop
+    $res['price_max'] = 8;     // Max price - at shop with + at barter
+    // $ar['hp'] = 5;          // Durability of item (TBD)
     
     return $res;
 }
@@ -38,13 +58,15 @@ function ore_tpl(){
 function herb_tpl(){
     
     $res = array();
-    $ar['name'] = 'No name';  // name of item
-	$ar['item_id'] = 0;       // id for or from DB
-	$ar['weight'] = 1;        // to select among other items - more weight, more chance
-	$ar['chance'] = 1;        // chance to get this item (1 = 100%)
-    $ar['count_min'] = 1;     // Min items
-    $ar['count_max'] = 1;     // Max items
+    $res['name'] = 'No name';  // name of item
+	$res['item_id'] = 0;       // id for or from DB
+	$res['weight'] = 1;        // to select among other items - more weight, more chance
+	$res['chance'] = 1;        // chance to get this item (1 = 100%)
+    $res['count_min'] = 1;     // Min items
+    $res['count_max'] = 1;     // Max items
     // $ar['hp'] = 5;            // Durability of item (TBD)
+    $res['price_min'] = 1;     // Min price - default price at shop
+    $res['price_max'] = 10;    // Max price - at shop with + at barter
     
     return $res;
 }
@@ -53,18 +75,20 @@ function herb_tpl(){
 function jewel_tpl(){
     
     $res = array();
-    $ar['name'] = 'No name';  // name of item
-	$ar['item_id'] = 0;       // id for or from DB
-	$ar['weight'] = 1;        // to select among other items - more weight, more chance
-	$ar['chance'] = 1;        // chance to get this item (1 = 100%)
-    $ar['count_min'] = 1;     // Min items
-    $ar['count_max'] = 1;     // Max items
-    // $ar['hp'] = 5;            // Durability of item (TBD)
+    $res['name'] = 'No name';  // name of item
+	$res['item_id'] = 0;       // id for or from DB
+	$res['weight'] = 1;        // to select among other items - more weight, more chance
+	$res['chance'] = 0.05;     // chance to get this item (1 = 100%)
+    $res['count_min'] = 1;     // Min items
+    $res['count_max'] = 1;     // Max items
+    $res['price_min'] = 10;    // Min price - default price at shop
+    $res['price_max'] = 100;   // Max price - at shop with + at barter
+    // $ar['hp'] = 5;          // Durability of item (TBD)
     
     return $res;
 }
 
-
+// Trees ---------------------------------------------------------------------->
 function tree_tis(){
 
     $ar = tree_tpl();
@@ -100,6 +124,7 @@ function tree_el(){
     
     return $ar;
 }
+// ---------------------------------------------------------------------------->
 
 
 // Ores ----------------------------------------------------------------------->
@@ -172,14 +197,6 @@ function ore_titan(){
     return $res;
 }
 
-function ore_titan(){
-
-    $res = ore_tpl();
-	$res['name'] = 'Титанит (Титановая руда)';
-	$res['item_id'] = 6; 
-    
-    return $res;
-}
 
 function ore_mithril(){
 
@@ -208,8 +225,6 @@ function ore_adamantin(){
 
 
 // Jewels --------------------------------------------------------------------->
-
-
 function jewel_crystal(){
 
     $res = jewel_tpl();
@@ -265,84 +280,125 @@ function jewel_sapphire(){
     return $res;
 }
 
+function jewels(){
+
+    $res = array();
+    
+    $res[] = jewel_crystal();
+    $res[] = jewel_topaz();
+    $res[] = jewel_emerald();
+    $res[] = jewel_ruby();
+    $res[] = jewel_diamond();
+    $res[] = jewel_sapphire();
+    
+    return $res;
+}
 // ---------------------------------------------------------------------------->
 
 function qdm_ores(){
     
     $res = array();
-	$ar = ore_tpl();
-	$ar['name'] = 'Медь';
-	$ar['item_id'] = 1; 
- 	$ar['weight'] = 100;
-	$ar['chance'] = 0.6;
-    $ar['count_min'] = 1;
-    $ar['count_max'] = 2;
-
-
-	$res[] = $ar;
-
-    $ar = ore_tpl();
-	$ar['name'] = 'Железистый кварцит';
-	$ar['item_id'] = 2;
-	$ar['weight'] = 40;
-	$ar['chance'] = 0.4;
-    $ar['count_min'] = 1;
-    $ar['count_max'] = 2;
-
-
-	$res[] = $ar;
+	$res[] = ore_stone();
+    $res[] = ore_iron();
+    $res[] = ore_copper();
+    $res[] = ore_tin();
+    $res[] = ore_silver();
+    $res[] = ore_gold();
+    $res[] = ore_titan();
+    $res[] = ore_mithril();
+    $res[] = ore_adamantin();
 
 	return $res;
 
 }
 
 
-function qdm_herbs(){
-
-	$res = array();
-	$ar = herb_tpl();
-	$ar['name'] = 'Листья черного чая';
-	$ar['item_id'] = 1001; 
- 	$ar['weight'] = 100;
-	$ar['chance'] = 0.6; // chance
-
-
-	$res[] = $ar;
+function herb_green_tea(){
 
     $ar = herb_tpl();
 	$ar['name'] = 'Листя зеленного чая';
 	$ar['item_id'] = 1002;
 	$ar['weight'] = 60;
 	$ar['chance'] = 0.4;
+}
 
+function herb_gback_tea(){
 
-	$res[] = $ar;
-
-	return $res;
-
+    $res = array();
+	$ar = herb_tpl();
+	$ar['name'] = 'Листья черного чая';
+	$ar['item_id'] = 1001; 
+ 	$ar['weight'] = 100;
+	$ar['chance'] = 0.6;
 }
 
 
-function qdm_wood(){
+function herb_lily(){
+
+    $res = array();
+	$ar = herb_tpl();
+	$ar['name'] = 'Лилия';
+	$ar['item_id'] = 1001; 
+ 	$ar['weight'] = 100;
+	$ar['chance'] = 0.4;
+}
+
+function herb_rose(){
+
+    $res = array();
+	$ar = herb_tpl();
+	$ar['name'] = 'Роза';
+	$ar['item_id'] = 1001; 
+ 	$ar['weight'] = 100;
+	$ar['chance'] = 0.4;
+}
+
+function herb_blueberry(){
+
+    $res = array();
+	$ar = herb_tpl();
+	$ar['name'] = 'Куст черники';
+	$ar['item_id'] = 1001; 
+ 	$ar['weight'] = 100;
+	$ar['chance'] = 0.4;
+}
+
+function herb_ginseng(){
+
+    $res = array();
+	$ar = herb_tpl();
+	$ar['name'] = 'Женьшень';
+	$ar['item_id'] = 1001; 
+ 	$ar['weight'] = 100;
+	$ar['chance'] = 0.4;
+}
+
+function fruit_blueberry(){
+
+    $res = array();
+	$ar = herb_tpl();
+	$ar['name'] = 'Черника';
+	$ar['item_id'] = 1; 
+ 	$ar['weight'] = 100;
+	$ar['chance'] = 0.4;
+}
+
+function fruit_blueberry(){
+
+    $res = array();
+	$ar = herb_tpl();
+	$ar['name'] = 'Черника';
+	$ar['item_id'] = 1; 
+ 	$ar['weight'] = 100;
+	$ar['chance'] = 0.4;
+}
+
+
+function qdm_herbs(){
 
 	$res = array();
-	$ar = array();
-	$ar['name'] = 'бревно Сосны';
-	$ar['item_id'] = 2001; 
- 	$ar['weight'] = 100;
-	$ar['chance'] = 0.6;
-
-
-	$res[] = $ar;
-
-
-	$ar['name'] = 'бревно Сосны';
-	$ar['item_id'] = 2001;
-	$ar['weight'] = 60;
-	$ar['chance'] = 0.4;
-
-
-	$res[] = $ar;
+	$res[] = herb_green_tea();
+    $res[] = herb_gback_tea();
 
 	return $res;
 
@@ -409,11 +465,13 @@ function qdm_select_prof_item($items, &$log = array()){
 
     // Chance to activate item
     if( $chance > $item['chance'] ) return false; // No item
-
+    
+    
+    
 	return $item;
 }
 
-$items = qdm_herbs();
+$items = array(jewel_sapphire());
 $item  = qdm_select_prof_item($items, $log);
 d_echo($log);
 d_echo($item);
@@ -454,5 +512,19 @@ d_echo($item);
 
 d_echo('test');
 die;
+
+
+
+// Sript to multiplayer round by round
+
+// if( !isset($_SESSION['player']) ){
+    // $_SESSION['player'] = 'player ' . time();
+    // $_SESSION['hp'] = 100;
+// }
+
+// 1. set ts of round start in db, count players
+// 2. wait for player actions - if scipt is called
+// 2.1. read from db params of round - (if player counts not all and round time still goes, just save player actions)
+// 2.2. if all players done or time is up - cacl result - write result to db
 
 ?>
