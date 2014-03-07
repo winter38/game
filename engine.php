@@ -6,15 +6,19 @@ inc_fl_lib('qdm/qdm_cfg.php');
 inc_fl_lib('html.php');
 inc_fl_lib('magic.php');
 
+// Float random
 function mt_frand(){
     return mt_rand() / mt_getrandmax();
 }
 
-// events
+
+// Add one
+// events some events
+// Add two
 $e = array();
 // on_init - player contains only basic and default attributes
 
-// Game config ---------------------------------------------------------------->
+// Gme config ---------------------------------------------------------------->
 $game = array();
 $game['rounds']     = 0;  // how many round to battle. 0 - to death
 $game['round_hits'] = 10; // how many times players moves ( atomic round ) in each round
