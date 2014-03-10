@@ -12,9 +12,6 @@ function mt_frand(){
 }
 
 
-// Add one
-// events some events
-// Add two
 $e = array();
 // on_init - player contains only basic and default attributes
 
