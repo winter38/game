@@ -9,8 +9,7 @@ inc_fl_lib('magic.php');
 function mt_frand(){
     return mt_rand() / mt_getrandmax();
 }
-// Test -2
-// events 2
+
 $e = array();
 // on_init - player contains only basic and default attributes
 
