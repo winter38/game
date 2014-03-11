@@ -280,37 +280,7 @@ function jewel_sapphire(){
     return $res;
 }
 
-function jewels(){
-
-    $res = array();
-    
-    $res[] = jewel_crystal();
-    $res[] = jewel_topaz();
-    $res[] = jewel_emerald();
-    $res[] = jewel_ruby();
-    $res[] = jewel_diamond();
-    $res[] = jewel_sapphire();
-    
-    return $res;
-}
 // ---------------------------------------------------------------------------->
-
-function qdm_ores(){
-    
-    $res = array();
-	$res[] = ore_stone();
-    $res[] = ore_iron();
-    $res[] = ore_copper();
-    $res[] = ore_tin();
-    $res[] = ore_silver();
-    $res[] = ore_gold();
-    $res[] = ore_titan();
-    $res[] = ore_mithril();
-    $res[] = ore_adamantin();
-
-	return $res;
-
-}
 
 
 function herb_green_tea(){
@@ -373,6 +343,8 @@ function herb_ginseng(){
 	$ar['chance'] = 0.4;
 }
 
+
+/* FRUITS */
 function fruit_blueberry(){
 
     $res = array();
@@ -383,26 +355,78 @@ function fruit_blueberry(){
 	$ar['chance'] = 0.4;
 }
 
-function fruit_blueberry(){
 
+
+function qdm_ores(){
+    
     $res = array();
-	$ar = herb_tpl();
-	$ar['name'] = 'Черника';
-	$ar['item_id'] = 1; 
- 	$ar['weight'] = 100;
-	$ar['chance'] = 0.4;
+	$res[] = ore_stone();
+    $res[] = ore_iron();
+    $res[] = ore_copper();
+    $res[] = ore_tin();
+    $res[] = ore_silver();
+    $res[] = ore_gold();
+    $res[] = ore_titan();
+    $res[] = ore_mithril();
+    $res[] = ore_adamantin();
+
+	return $res;
+
 }
 
+function jewels(){
+
+    $res = array();
+    
+    $res[] = jewel_crystal();
+    $res[] = jewel_topaz();
+    $res[] = jewel_emerald();
+    $res[] = jewel_ruby();
+    $res[] = jewel_diamond();
+    $res[] = jewel_sapphire();
+    
+    return $res;
+}
 
 function qdm_herbs(){
 
 	$res = array();
 	$res[] = herb_green_tea();
     $res[] = herb_gback_tea();
+    $res[] = herb_lily();
+    $res[] = herb_ginseng();
+    $res[] = herb_blueberry();
+    $res[] = herb_lily();
 
 	return $res;
 
 }
+
+function qdm_locations(){
+    
+    // Tmp location and dungeon names
+    $res = array();
+    $res[] = 'Забытые земли';
+    $res[] = 'Драконьи горы';
+    $res[] = 'Лунный лес';
+    $res[] = 'Лабиринт забвения';
+    $res[] = 'Бесконечные пески';
+    $res[] = '';
+    $res[] = '';
+    $res[] = '';
+    
+}
+
+
+function qdm_fishing(){
+    
+    // fish
+    // some chests
+    // pearl?
+    
+}
+
+
 
 // Select random item
 function qdm_select_prof_item($items, &$log = array()){
