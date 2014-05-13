@@ -6,19 +6,15 @@ inc_fl_lib('qdm/qdm_cfg.php');
 inc_fl_lib('html.php');
 inc_fl_lib('magic.php');
 
-// Float random
 function mt_frand(){
     return mt_rand() / mt_getrandmax();
 }
 
-
-// Add one
-// events some events
-// Add two
+// events
 $e = array();
 // on_init - player contains only basic and default attributes
 
-// Gme config ---------------------------------------------------------------->
+// Game config ---------------------------------------------------------------->
 $game = array();
 $game['rounds']     = 0;  // how many round to battle. 0 - to death
 $game['round_hits'] = 10; // how many times players moves ( atomic round ) in each round
@@ -33,7 +29,8 @@ $pls = array();
 $pls[] = init_player();
 $pls[] = init_player();
 
-$p1 = $p2 = $pls[0];
+$p1 = $pls[0];
+$p2 = $pls[1];
 $p1['name'] = 'player1';
 $p2['name'] = 'player2';
 $p1['index'] = 0;
@@ -89,7 +86,7 @@ function battle($pls, $grp){
     $init = players_initiative($pls);
     // ------------------------------------------------------------------------>
         
-    // d_echo($pls);
+    
     $while_counter = 0;
     $rounds_counter = 0;
     $ci = count($init);
@@ -288,11 +285,16 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
     
     // Rolls ------------------------------------------------------------------>
     $hit   = mt_frand();
-    $dmg   = mt_rand(1, $cfg['weapons'][$weapon_id]['dmg']) + $p1['dmg'] + $p1['tmp']['dmg'];
+    $dmg   = mt_rand(1, $cfg['weapons'][$weapon_id]['dmg']) + $p1['dmg'] + $p1['tmp']['dmg'] + $p1['dmg+'];
     $block = mt_frand();
     $crit  = mt_frand();
 
-    $cur_log['dmg_log'] .= '1d' . $cfg['weapons'][$weapon_id]['dmg'] . ' + ' . $p1['dmg'] . ' (player bonus as str) + '. $p1['tmp']['dmg'].'(buf) = ' . $dmg;
+    $log_det  = 'Hit: '.(100 - round($hit, 2)*100).'%' . "\n";
+    $log_det .= 'Miss chance: '.(100-round($hit_chance, 2)*100).'%'. "\n";
+    $log_det .= 'Crit: '. (round($crit, 2)*100) .'%'. "\n";
+    $log_det .= '1d' . $cfg['weapons'][$weapon_id]['dmg'] . ' + ' . ($p1['dmg'] + $p1['dmg+']) . ' (player bonus as str) + '. $p1['tmp']['dmg'].'(buf)' . "\n";;
+    $log_det .= 'Dmg: ' . $dmg;
+    $cur_log['dmg_log'] .= $log_det;
 
     $cur_log['hit']   = $hit;
     $cur_log['miss']  = 0;
@@ -317,12 +319,14 @@ function player_hit(&$p1, &$pls, $grp, &$log, &$params){
             $cur_log['dmg_log'] .= '/2 (block)';
             $cur_log['dmg_log'] .= ' - ' . $p2_defense . ' (ac)'; 
             
+            $cur_log['block'] = $dmg;
+
             $dmg = armor($p2_defense, $dmg);
             
             $p2['st'] -= $dmg;
             $p2['hp'] -= $dmg;
             
-            $cur_log['block'] = $dmg;
+            
             $cur_log['block_msg'] = 1;
             $cur_log['dmg'] = $dmg;
             
@@ -440,6 +444,7 @@ function player_active_magic($p1, &$log, &$params){
 
 function magic_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
 
+
     $ci   = count($params['stack']);
     $last = $ci - 1;
 
@@ -460,11 +465,17 @@ function magic_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
                 $index  = $p1['index'];
                 $op_index = qdm_find_opponent($pls, $grp, $index); // Now we must find opponent
                 $p2 = &$pls[$op_index];
+
                 $cur_log['targets'][] = $p2['index'];
 
                 $dmg = mt_rand($cur['dmg_min'], $cur['dmg_max']) * $cur['multiply'];
+                $dmg += $p1[$cur['school']]['dmg'];
+                $dmg -= $p2[$cur['school']]['resistance'];
 
-                $p2['hp'] -= $dmg;
+                $cur['debug'] = 'Dmg: ' . $cur['dmg_min'] . '-' . $cur['dmg_max'] . ', + ' . $p1[$cur['school']]['dmg'] . "(element bonus) \n";
+                $cur['debug'] .= 'Resistance: -' . $p2[$cur['school']]['resistance'] . "\n";
+
+                $pls[$op_index]['hp'] -= $dmg;
                 $cur['ids'][] = $p2['index'];
                 $cur['dmg'] = $dmg;
             }
@@ -481,20 +492,36 @@ function magic_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
 
         case 'poison':{
 
-            $dmg = mt_rand($cur['dmg_min'], $cur['dmg_max']) * $cur['multiply'];
-            $cur['dmg'] = $dmg;
-            $cur['effect'] = array();
-            $cur['ids'][] = $p1['index'];
-            $params['buf'][] = $cur;
+            $ci = $cur['target'];
+            for($i = 0; $i < $ci; $i++){ 
+
+                $index  = $p1['index'];
+                $op_index = qdm_find_opponent($pls, $grp, $index); // Now we must find opponent
+                $p2 = &$pls[$op_index];
+                $cur_log['targets'][] = $p2['index'];
+
+                $dmg = mt_rand($cur['dmg_min'], $cur['dmg_max']) * $cur['multiply'];
+                $p2['hp'] -= $dmg;
+                $cur['ids'][] = $p2['index'];
+                $cur['dmg'] = $dmg;
+
+                $cur['effect'] = array();
+                $params['buf'][] = $cur;
+            }
             break;
         }
 
         case 'heal':
 
             $dmg = mt_rand($cur['dmg_min'], $cur['dmg_max']);
+            $dmg += $p1[$cur['school']]['dmg'];
+            
+            $cur['debug'] = 'Dmg: ' . $cur['dmg_min'] . '-' . $cur['dmg_max'] . ', + ' . $p1[$cur['school']]['dmg'] . "(element bonus) \n";
 
             $need_hp = $p1['hp_max'] - $p1['hp'];
+            
             if( $dmg > $need_hp ) $dmg = $need_hp;
+
 
             $p1['hp'] += $dmg;
             $cur['ids'][] = $p1['index'];
@@ -565,6 +592,8 @@ function magic_simphony(&$p1, &$pls, $grp, &$cur_log, &$params = array()){
     
     
     $cur_log['magic'] = $cur;
+
+    return true;
 }
 
 
