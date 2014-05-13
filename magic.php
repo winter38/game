@@ -99,15 +99,15 @@ function player_magic_fill($p1){
     
     $tmp = $tpl;
     $tmp['id'] = 'fire';
-    $tmp['school'][] = 'fire';
+    $tmp['school'] = 'fire';
     $tmp['name'] = 'Огонёк';
     $tmp['dmg_min'] = 1;
     $tmp['dmg_max'] = 4;
-    // $magic[] = $tmp;
+    $magic[] = $tmp;
     
     $tmp = $tpl;
     $tmp['id'] = 'flame';
-    $tmp['school'][] = 'fire';
+    $tmp['school'] = 'fire';
     $tmp['name'] = 'Пламя';
     $tmp['dmg_min'] = 1;
     $tmp['dmg_max'] = 4;
@@ -116,7 +116,7 @@ function player_magic_fill($p1){
     
     $tmp = $tpl;
     $tmp['id'] = 'fire_flash';
-    $tmp['school'][] = 'fire';
+    $tmp['school'] = 'fire';
     $tmp['name'] = 'Пламя';
     $tmp['dmg_min'] = 1;
     $tmp['dmg_max'] = 4;
@@ -125,7 +125,7 @@ function player_magic_fill($p1){
     
     $tmp = $tpl;
     $tmp['id'] = 'flame';
-    $tmp['school'][] = 'fire';
+    $tmp['school'] = 'fire';
     $tmp['name'] = 'Пламя';
     $tmp['dmg_min'] = 1;
     $tmp['dmg_max'] = 4;
@@ -133,9 +133,9 @@ function player_magic_fill($p1){
     
     
     $tmp = $tpl;
-    $tmp['id'] = 'ice';
-    $tmp['name'] = 'Лёд';
-    $tmp['school'][]  = 'ice';
+    $tmp['id'] = 'water';
+    $tmp['name'] = 'Ледянное прикосновение';
+    $tmp['school']  = 'water';
     $tmp['dmg_min'] = 1;
     $tmp['dmg_max'] = 4;
     $tmp['target']  = 1;
@@ -146,7 +146,7 @@ function player_magic_fill($p1){
     $tmp = $tpl;
     $tmp['id'] = 'ice_needle';
     $tmp['name'] = 'Лёдeная игла';
-    $tmp['school'][]  = 'ice';
+    $tmp['school']  = 'water';
     $tmp['dmg_min'] = 1;
     $tmp['dmg_max'] = 4;
     $tmp['multiply'] = 3;
@@ -157,7 +157,7 @@ function player_magic_fill($p1){
 
     $tmp = $tpl;
     $tmp['id'] = 'poison';
-    $tmp['school'][] = 'poison'; // water or dark
+    $tmp['school'] = 'water'; // water or dark
     $tmp['name'] = 'Яд';
     $tmp['dmg_min'] = 1;
     $tmp['dmg_max'] = 2;
@@ -167,29 +167,29 @@ function player_magic_fill($p1){
     $tmp['weight']  = 0.1;
     $magic[] = $tmp;
     
-    // $tmp = $tpl;
-    // $tmp['id'] = 'earth_shield';
-    // $tmp['school'][] = 'earth';
-    // $tmp['name'] = 'Каменный щит';
-    // $tmp['effect']['ac'] = 2;
-    // $tmp['res'] = '+2 AC';
-    // $tmp['target']  = 1;
-    // $tmp['duration']  = 3;
-    // $tmp['chance']  = 0.1;
-    // $tmp['weight']  = 0.1;
-    // $magic[] = $tmp;
+    $tmp = $tpl;
+    $tmp['id'] = 'earth_shield';
+    $tmp['school'] = 'earth';
+    $tmp['name'] = 'Каменный щит';
+    $tmp['effect']['ac'] = 2;
+    $tmp['res'] = '+2 AC';
+    $tmp['target']  = 1;
+    $tmp['duration']  = 3;
+    $tmp['chance']  = 0.1;
+    $tmp['weight']  = 0.1;
+    $magic[] = $tmp;
     
  
-    // $tmp = $tpl;
-    // $tmp['id'] = 'heal';
-    // $tmp['school'][] = 'water';
-    // $tmp['name'] = 'Лечение';
-    // $tmp['target']  = 1;
-    // $tmp['chance']  = 0.1;
-    // $tmp['weight']  = 0.1;
-    // $tmp['dmg_min'] = 1;
-    // $tmp['dmg_max'] = 10;
-    // $magic[] = $tmp;
+    $tmp = $tpl;
+    $tmp['id'] = 'heal';
+    $tmp['school'] = 'water';
+    $tmp['name'] = 'Лечение';
+    $tmp['target']  = 1;
+    $tmp['chance']  = 0.1;
+    $tmp['weight']  = 0.1;
+    $tmp['dmg_min'] = 1;
+    $tmp['dmg_max'] = 10;
+    $magic[] = $tmp;
     
     return $magic;
 }
