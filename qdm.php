@@ -77,28 +77,37 @@ function init_player($id = false){
     // save basic values for logs and ui -------------------------------------->
     $s['base'] = $s;
     // ------------------------------------------------------------------------>
-    
-    
-    // Calculate stat bonus and other not basic parametrs --------------------->
-    $s['st']      += $s['end']*5;
-    $s['hp']      += $s['con']*3;
-    $s['dmg']     = 8 + floor($s['str']/5); // Max damage
-    $s['dmg+']    = floor($s['str']/3); // bonus damage
-    
-    $s['fort'] += floor($s['con']/5);
-    $s['ref']  += floor($s['dex']/5);
-    $s['will'] += floor($s['int']/5);
-    $s['init'] += mt_rand(1, 20) + floor($s['dex']/3);
-    
-    $s['hp_max'] = $s['hp'];
-    $s['st_max'] = $s['st'];
 
+
+    // Elementals ------------------------------------------------------------->
+    $elems = array();
+    $elems[] = 'fire';
+    $elems[] = 'earth';
+    $elems[] = 'air';
+    $elems[] = 'water';
+    $elems[] = 'light';
+    $elems[] = 'dark';
+
+    $ci = count($elems);
+    for($i = 0; $i < $ci; $i++){ 
+        
+        $s[$elems[$i]]['resistance'] = 0;
+        $s[$elems[$i]]['dmg'] = 0; // bonues on element
+    }
+    // ------------------------------------------------------------------------>
+
+
+    // Select weapon, armor --------------------------------------------------->
     $s['armor']  = mt_rand(1, count(qdm_cfg_armors()));
     $s['weapon'] = mt_rand(1, count(qdm_cfg_wepons()));
     $s['ac']     = $cfg['armors'][$s['armor']]['ac'];
+    $s['dmg+']   = 0; // bonus damage
+    $s['hp+']    = 0;
+    $s['st+']    = 0;
+
     // ------------------------------------------------------------------------>
-    
-    
+
+
     // Event on_init ---------------------------------------------------------->
     // Hm, player feature bonus?
     // + item bonus (only that work always)
@@ -122,6 +131,13 @@ function init_player($id = false){
     $skill['lvl'] = 10;
     $s['skills'][] = $skill;
 
+    $skill = skill_defense($s);
+    $skill['lvl'] = 10;
+    $s['skills'][] = $skill;
+
+    $skill = skill_attack($s);
+    $skill['lvl'] = 10;
+    $s['skills'][] = $skill;
     
     $ci = count($s['skills']);
     for($i = 0; $i < $ci; $i++){ 
@@ -129,21 +145,22 @@ function init_player($id = false){
         $cur_level = $s['skills'][$i]['lvl'];
         if( $s['skills'][$i]['type'] == 'weapon' ){
 
-            if( $cfg['weapons'][$s['weapon']]['id'] !== $s['skills'][$i]['id'] ) break; // weapon dont macthed
-
+            if( $cfg['weapons'][$s['weapon']]['id'] !== $s['skills'][$i]['id'] ) continue; // weapon dont macthed
         }
 
-        for($j = 1; $j < $cur_level; $j++){ 
+
+        for($j = 1; $j <= $cur_level; $j++){ 
             
             if( !isset($s['skills'][$i]['level'][$j]) ) break; // no bonus for higher level
-
 
             $keys = array_keys($s['skills'][$i]['level'][$j]);
             $ck = count($keys);
             for($k = 0; $k < $ck; $k++){ 
 
                 $key = $keys[$k];
+                if( !isset($s[$key]) ) $s[$key] = 0;
                 $s[$key] += $s['skills'][$i]['level'][$j][$key];
+                
             }
 
         }
@@ -151,6 +168,23 @@ function init_player($id = false){
     }
     // ------------------------------------------------------------------------>
 
+
+    // Calculate stat bonus and other not basic parametrs --------------------->
+    $s['st']      += $s['end']*5 + $s['st+'];
+    $s['hp']      += $s['con']*3 + $s['hp+'];
+    $s['dmg']     = 8 + floor($s['str']/5); // Max damage
+
+    
+    $s['fort'] += floor($s['con']/5);
+    $s['ref']  += floor($s['dex']/5);
+    $s['will'] += floor($s['int']/5);
+    $s['init'] += mt_rand(1, 20) + floor($s['dex']/3);
+    
+    $s['hp_max'] = $s['hp'];
+    $s['st_max'] = $s['st'];
+    // ------------------------------------------------------------------------>
+
+    // d_echo($s);
 
     // Magick ----------------------------------------------------------------->
     // Magick will be filled according skills - just nedd skill mastery
@@ -179,8 +213,6 @@ function init_player($id = false){
 
     return $s;
 }
-
-
 
 
 // qdm_user_stcuct()
