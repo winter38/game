@@ -10,4 +10,17 @@ battle
   state
   player  - player structure with current states
   enemies - array with enemies structures
+
+
+
+
+resits and elements
+Damage can have element 
+ - no element
+ - fire
+ - water
+ - earth
+ - wind
+
+can have many elements, but sum only 100% (fire 5% + 95% non elemental)
   
